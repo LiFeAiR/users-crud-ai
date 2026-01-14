@@ -51,6 +51,7 @@ func TestGetUserHandler_Success(t *testing.T) {
 		ID:    1,
 		Name:  "John Doe",
 		Email: "john@example.com",
+		Organization: "Test Org",
 	}
 
 	// Определяем ожидаемое поведение мока
@@ -83,6 +84,7 @@ func TestGetUserHandler_Success(t *testing.T) {
 	assert.Equal(t, testUser.ID, responseUser.ID)
 	assert.Equal(t, testUser.Name, responseUser.Name)
 	assert.Equal(t, testUser.Email, responseUser.Email)
+	assert.Equal(t, testUser.Organization, responseUser.Organization)
 
 	// Проверяем, что мок был вызван правильно
 	mockRepo.AssertExpectations(t)

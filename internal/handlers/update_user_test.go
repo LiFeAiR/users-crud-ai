@@ -14,7 +14,7 @@ import (
 
 func TestUpdateUserHandler(t *testing.T) {
 	// Create a test request with valid JSON
-	jsonData := `{"id":1,"name":"John Smith","email":"johnsmith@example.com","password":"newpassword123"}`
+	jsonData := `{"id":1,"name":"John Smith","email":"johnsmith@example.com","password":"newpassword123","organization":"Updated Org"}`
 	req := httptest.NewRequest("PUT", "/api/user", bytes.NewBufferString(jsonData))
 	req.Header.Set("Content-Type", "application/json")
 
@@ -45,6 +45,7 @@ func TestUpdateUserHandler(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "John Smith", responseUser.Name)
 	assert.Equal(t, "johnsmith@example.com", responseUser.Email)
+	assert.Equal(t, "Updated Org", responseUser.Organization)
 	assert.Equal(t, 1, responseUser.ID) // Dummy ID
 }
 

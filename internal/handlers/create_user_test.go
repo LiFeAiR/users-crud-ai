@@ -14,7 +14,7 @@ import (
 
 func TestCreateUserHandler(t *testing.T) {
 	// Create a test request with valid JSON
-	jsonData := `{"name":"John Doe","email":"john@example.com","password":"secret123"}`
+	jsonData := `{"name":"John Doe","email":"john@example.com","password":"secret123","organization":"Test Org"}`
 	req := httptest.NewRequest("POST", "/api/user", bytes.NewBufferString(jsonData))
 	req.Header.Set("Content-Type", "application/json")
 
@@ -27,6 +27,7 @@ func TestCreateUserHandler(t *testing.T) {
 		Name:     "John Doe",
 		Email:    "john@example.com",
 		Password: "secret123",
+		Organization: "Test Org",
 	}
 
 	// Определяем ожидаемое поведение мока
