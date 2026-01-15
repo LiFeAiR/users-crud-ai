@@ -6,6 +6,9 @@ This is a REST API server implementation with database connection capabilities.
 
 ```
 .
+├── api/
+│   └── openapi/
+│       └── api.yaml         # OpenAPI specification
 ├── cmd/
 │   ├── app/
 │   │   └── main.go          # Main entry point
@@ -14,9 +17,12 @@ This is a REST API server implementation with database connection capabilities.
 ├── internal/
 │   ├── handlers/            # HTTP handlers
 │   ├── models/              # Data models
+│   │   ├── organization.go  # Organization data model
+│   │   └── user.go          # User data model
 │   ├── repository/          # Database connection and repositories
 │   │   ├── db.go            # Database connection class
 │   │   ├── interface.go     # Repository interface
+│   │   ├── organization_repository.go  # Organization repository implementation
 │   │   └── repository.go    # User repository implementation
 │   └── server/              # HTTP server implementation
 └── go.mod                   # Go modules file
@@ -67,15 +73,26 @@ HTTP handlers in `internal/handlers/` now use the repository pattern through a b
 
 ## API Endpoints
 
+
 The server now supports the following endpoints:
 
-- `GET /` - Root endpoint
-- `GET /api/users` - Get list of users
+`GET /` - Root endpoint
+
+### Users
+
+- `GET /api/users` - Get list of users (requires limit and offset query parameters)
 - `GET /api/user` - Get user by ID (requires id query parameter)
 - `POST /api/user` - Create a new user
 - `PUT /api/user` - Update an existing user
 - `DELETE /api/user` - Delete a user
 
+### Organizations
+
+- `GET /api/organizations` - Get list of organizations (requires limit and offset query parameters)
+- `GET /api/organization` - Get organization by ID (requires id query parameter)
+- `POST /api/organization` - Create a new organization
+- `PUT /api/organization` - Update an existing organization
+- `DELETE /api/organization` - Delete an organization
 ## Getting Started
 
 1. Make sure you have Go installed
