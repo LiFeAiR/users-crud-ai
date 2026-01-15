@@ -25,8 +25,20 @@ This is a REST API server implementation with database connection capabilities.
 │   │   ├── organization_repository.go  # Organization repository implementation
 │   │   └── user_repository.go    # User repository implementation
 │   └── server/              # HTTP server implementation
-└── go.mod                   # Go modules file
+├── go.mod                   # Go modules file
+├── build/                   # Build and deployment configurations
+│   ├── .env                 # Environment variables for Docker Compose
+│   └── docker-compose.yml   # Docker Compose configuration for PostgreSQL database
 ```
+
+## Build and Deployment
+
+The `build` directory contains configuration files for building and deploying the application with Docker Compose and PostgreSQL:
+
+- `.env`: Environment variables for database and pgAdmin configuration
+- `docker-compose.yml`: Docker Compose configuration that sets up PostgreSQL database service
+
+These files allow you to easily spin up the entire application environment with a single command using Docker Compose.
 
 ## Database Connection Class
 
