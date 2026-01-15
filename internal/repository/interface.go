@@ -11,3 +11,13 @@ type UserRepository interface {
 	GetUsers(limit, offset int) ([]*models.User, error)
 	InitDB() error
 }
+
+// OrganizationRepository интерфейс для работы с организациями
+type OrganizationRepository interface {
+	CreateOrganization(org *models.Organization) (*models.Organization, error)
+	GetOrganizationByID(id int) (*models.Organization, error)
+	UpdateOrganization(org *models.Organization) error
+	DeleteOrganization(id int) error
+	GetOrganizations(limit, offset int) ([]*models.Organization, error)
+	InitDB() error
+}

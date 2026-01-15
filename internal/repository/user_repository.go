@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 
@@ -22,7 +23,11 @@ func NewUserRepository(db *DB) UserRepository {
 // CreateUser создает нового пользователя
 func (r *userRepository) CreateUser(user *models.User) (*models.User, error) {
 	query := `INSERT INTO users (name, email, organization) VALUES ($1, $2, $3) RETURNING id`
-	err := r.db.GetConnection().QueryRow(context.Background(), query, user.Name, user.Email, user.Organization).Scan(&user.ID)
+	var org interface{}
+	if user.Organization != nil {
+		org = *user.Organization
+	}
+	err := r.db.GetConnection().QueryRow(context.Background(), query, user.Name, user.Email, org).Scan(&user.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
@@ -35,12 +40,20 @@ func (r *userRepository) GetUserByID(id int) (*models.User, error) {
 	row := r.db.GetConnection().QueryRow(context.Background(), query, id)
 
 	user := &models.User{}
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Organization)
+	var org sql.NullString
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &org)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+	
+	// Проверяем, было ли значение NULL
+	if org.Valid {
+		user.Organization = &org.String
+	} else {
+		user.Organization = nil
 	}
 
 	return user, nil
@@ -49,7 +62,11 @@ func (r *userRepository) GetUserByID(id int) (*models.User, error) {
 // UpdateUser обновляет информацию о пользователе
 func (r *userRepository) UpdateUser(user *models.User) error {
 	query := `UPDATE users SET name = $1, email = $2, organization = $3 WHERE id = $4`
-	_, err := r.db.GetConnection().Exec(context.Background(), query, user.Name, user.Email, user.Organization, user.ID)
+	var org interface{}
+	if user.Organization != nil {
+		org = *user.Organization
+	}
+	_, err := r.db.GetConnection().Exec(context.Background(), query, user.Name, user.Email, org, user.ID)
 	if err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
 	}
@@ -78,9 +95,17 @@ func (r *userRepository) GetUsers(limit, offset int) ([]*models.User, error) {
 	var users []*models.User
 	for rows.Next() {
 		user := &models.User{}
-		err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Organization)
+		var org sql.NullString
+		err := rows.Scan(&user.ID, &user.Name, &user.Email, &org)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan user: %w", err)
+		}
+		
+		// Проверяем, было ли значение NULL
+		if org.Valid {
+			user.Organization = &org.String
+		} else {
+			user.Organization = nil
 		}
 		users = append(users, user)
 	}
@@ -100,12 +125,15 @@ CREATE TABLE IF NOT EXISTS users (
 	name VARCHAR(255) NOT NULL,
 	email VARCHAR(255) UNIQUE NOT NULL,
 	organization VARCHAR(255)
-)`
+);
+alter table users
+    add IF NOT EXISTS organization VARCHAR(255);
+`
 	_, err := r.db.GetConnection().Exec(context.Background(), query)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
 
-	log.Println("Database initialized successfully")
+	log.Println("UserRepository initialized successfully")
 	return nil
 }

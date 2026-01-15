@@ -23,6 +23,7 @@ func main() {
 
 	// Создаем репозиторий пользователей
 	userRepo := repository.NewUserRepository(db)
+	orgRepo := repository.NewOrganizationRepository(db)
 
 	// Инициализируем таблицы в БД
 	err = userRepo.InitDB()
@@ -30,5 +31,11 @@ func main() {
 		log.Fatal("Failed to initialize database:", err)
 	}
 
-	log.Println("Сli execution successfully")
+	// Инициализируем таблицы в БД
+	err = orgRepo.InitDB()
+	if err != nil {
+		log.Fatal("Failed to initialize database:", err)
+	}
+
+	log.Println("Сli executed successfully")
 }

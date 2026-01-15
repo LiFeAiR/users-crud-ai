@@ -6,5 +6,5 @@ type User struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password,omitempty"`
-	Organization string `json:"organization"`
+	Organization *string `json:"organization"`
 }

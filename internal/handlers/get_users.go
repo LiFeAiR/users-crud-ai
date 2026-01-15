@@ -7,7 +7,7 @@ import (
 )
 
 // GetUsersHandler обработчик для получения списка пользователей
-func (h *BaseHandler) GetUsersHandler(w http.ResponseWriter, r *http.Request) {
+func (h *BaseHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	// Получаем параметры limit и offset из запроса
 	limitStr := r.URL.Query().Get("limit")
 	offsetStr := r.URL.Query().Get("offset")

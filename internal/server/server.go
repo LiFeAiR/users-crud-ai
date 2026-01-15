@@ -37,7 +37,9 @@ func (s *Server) Start(connStr string) error {
 
 	s.db = db
 
-	baseHandler := handlers.NewBaseHandler(repository.NewUserRepository(db))
+	userRepo := repository.NewUserRepository(db)
+	orgRepo := repository.NewOrganizationRepository(db)
+	baseHandler := handlers.NewBaseHandler(userRepo, orgRepo)
 
 	//// Определяем обработчик для корневого пути
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -46,25 +48,59 @@ func (s *Server) Start(connStr string) error {
 
 	// Определяем обработчик для эндпоинта /api/users
 	http.HandleFunc("/api/users", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodGet {
-			baseHandler.GetUsersHandler(w, r)
-		} else {
+		switch r.Method {
+		case http.MethodGet:
+			baseHandler.GetUsers(w, r)
+		case http.MethodPost:
+			baseHandler.CreateUser(w, r)
+		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
 
 	// Определяем обработчик для эндпоинта /api/user с несколькими методами
-	http.HandleFunc("/api/user", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/api/user/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			// Определяем обработчик для GET /api/user/id=int
 			baseHandler.GetUser(w, r)
-		case http.MethodPost:
-			baseHandler.CreateUser(w, r)
 		case http.MethodPut:
 			baseHandler.UpdateUser(w, r)
 		case http.MethodDelete:
 			baseHandler.DeleteUser(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	// Определяем обработчики для эндпоинтов /api/organizations
+	http.HandleFunc("/api/organizations", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			// GET /api/organizations - получить список организаций
+			baseHandler.GetOrganizations(w, r)
+		case http.MethodPost:
+			// POST /api/organizations - создать новую организацию
+			baseHandler.CreateOrganization(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	// Определяем обработчик для эндпоинта /api/organization с методами GET, PUT, DELETE
+	http.HandleFunc("/api/organization/", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			// GET /api/organization/id - получить организацию по ID
+			baseHandler.GetOrganization(w, r)
+		case http.MethodPut:
+			// PUT /api/organization/id - обновить организацию
+			baseHandler.UpdateOrganization(w, r)
+		case http.MethodDelete:
+			// DELETE /api/organization/id - удалить организацию
+			baseHandler.DeleteOrganization(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
 

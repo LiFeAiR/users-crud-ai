@@ -30,6 +30,7 @@ func (bh *BaseHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "User not found", http.StatusNotFound)
 		} else {
 			http.Error(w, "Failed to get user", http.StatusInternalServerError)
+			log.Printf("Failed to get user: %v", err)
 		}
 		return
 	}
