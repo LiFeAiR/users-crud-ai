@@ -2,9 +2,16 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/LiFeAiR/users-crud-ai/internal/models"
 )
+
+type UsersResponse struct {
+	Data []*models.User `json:"data"`
+}
 
 // GetUsersHandler обработчик для получения списка пользователей
 func (h *BaseHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
@@ -40,12 +47,9 @@ func (h *BaseHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	// Отправляем ответ клиенту
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(&Response{
-		Data: users,
-	})
-}
 
-// Response структура для ответа API
-type Response struct {
-	Data interface{} `json:"data"`
+	// Send response
+	if err := json.NewEncoder(w).Encode(&UsersResponse{Data: users}); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }

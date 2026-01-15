@@ -5,7 +5,13 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/LiFeAiR/users-crud-ai/internal/models"
 )
+
+type OrganizationsResponse struct {
+	Data []*models.Organization `json:"data"`
+}
 
 // GetOrganizations получает список организаций с пагинацией
 func (bh *BaseHandler) GetOrganizations(w http.ResponseWriter, r *http.Request) {
@@ -34,9 +40,10 @@ func (bh *BaseHandler) GetOrganizations(w http.ResponseWriter, r *http.Request) 
 
 	// Set response headers
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 
 	// Send response
-	if err := json.NewEncoder(w).Encode(organizations); err != nil {
+	if err := json.NewEncoder(w).Encode(&OrganizationsResponse{Data: organizations}); err != nil {
 		log.Printf("Error encoding response: %v", err)
 	}
 }

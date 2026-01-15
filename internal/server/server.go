@@ -59,7 +59,7 @@ func (s *Server) Start(connStr string) error {
 	})
 
 	// Определяем обработчик для эндпоинта /api/user с несколькими методами
-	http.HandleFunc("/api/user/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/api/user", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			// Определяем обработчик для GET /api/user/id=int
@@ -88,7 +88,7 @@ func (s *Server) Start(connStr string) error {
 	})
 
 	// Определяем обработчик для эндпоинта /api/organization с методами GET, PUT, DELETE
-	http.HandleFunc("/api/organization/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/api/organization", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			// GET /api/organization/id - получить организацию по ID

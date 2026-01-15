@@ -1,0 +1,248 @@
+openapi: 3.0.3
+info:
+  version: 0.0.1
+  title: CRUD API
+  description: CRUD as Service
+paths:
+  /api/users:
+    get:
+      parameters:
+        - name: limit
+          required: true
+          in: query
+        - name: offset
+          required: true
+          in: query
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/models.UsersResponse"
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/models.UserCreateRequest"
+      responses:
+        '201':
+          description: Пользователь создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/models.User"
+  /api/user:
+    get:
+      parameters:
+        - name: id
+          required: true
+          in: query
+          description: ID идентификатор объекта User
+      responses:
+        '200':
+          description: Описание пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/models.User"
+    put:
+      parameters:
+        - name: id
+          required: true
+          in: query
+          description: ID идентификатор объекта User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/models.UserUpdateRequest"
+      responses:
+        '200':
+          description: Пользователь обновлен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/models.User"
+    delete:
+      parameters:
+        - name: id
+          required: true
+          in: query
+          description: ID идентификатор объекта User
+      responses:
+        '200':
+          description: Пользователь удален
+  /api/organizations:
+    get:
+      parameters:
+        - name: limit
+          required: true
+          in: query
+        - name: offset
+          required: true
+          in: query
+      responses:
+        '200':
+          description: Список организаций
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/models.OrganizationsResponse"
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/models.OrganizationCreateRequest"
+      responses:
+        '201':
+          description: Организация создана
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/models.Organization"
+  /api/organization:
+    get:
+      parameters:
+        - name: id
+          required: true
+          in: query
+          description: ID идентификатор объекта Organization
+      responses:
+        '200':
+          description: Описание организации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/models.Organization"
+    put:
+      parameters:
+        - name: id
+          required: true
+          in: query
+          description: ID идентификатор объекта Organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/models.OrganizationUpdateRequest"
+      responses:
+        '200':
+          description: Организация обновлена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/models.Organization"
+    delete:
+      parameters:
+        - name: id
+          required: true
+          in: query
+          description: ID идентификатор объекта Organization
+      responses:
+        '200':
+          description: Организация удалена
+components:
+  schemas:
+    models.UsersResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/models.User"
+    models.OrganizationsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/models.Organization"
+    models.User:
+      description: User object.
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: integer
+          format: int32
+          minimum: 0
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        organization:
+          type: string
+    models.UserCreateRequest:
+      description: Запрос на создание пользователя
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        organization:
+          type: string
+    models.UserUpdateRequest:
+      description: Запрос на обновление пользователя
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          minimum: 0
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        organization:
+          type: string
+    models.Organization:
+      description: Organization object.
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int32
+          minimum: 0
+        name:
+          type: string
+    models.OrganizationCreateRequest:
+      description: Запрос на создание организации
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    models.OrganizationUpdateRequest:
+      description: Запрос на обновление организации
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          minimum: 0
+        name:
+          type: string
