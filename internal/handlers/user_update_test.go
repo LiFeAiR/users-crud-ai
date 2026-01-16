@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/models"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -17,23 +18,27 @@ func TestBaseHandler_UpdateUser(t *testing.T) {
 	// Test 1: Успешное обновление пользователя
 	t.Run("UpdateUserSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockUserRepository)
+		userRepo := new(MockUserRepository)
+		orgRepo := new(MockOrganizationRepository)
 
 		// Определяем ожидаемое поведение мока
-		mockRepo.On("UpdateUser", ctx, mock.Anything).Return(nil)
+		userRepo.On("UpdateUser", ctx, mock.Anything).Return(nil)
+		var org *models.Organization
+		orgRepo.On("GetOrganizationByID", ctx, mock.Anything).Return(org, nil)
 
 		// Создаем базовый обработчик с моком
 		baseHandler := &BaseHandler{
-			userRepo: mockRepo,
+			userRepo: userRepo,
+			orgRepo:  orgRepo,
 		}
 
 		// Вызываем метод UpdateUser
 		result, err := baseHandler.UpdateUser(ctx, &grpc.UserUpdateRequest{
-			Id:           1,
-			Name:         "Updated User",
-			Email:        "updated@example.com",
-			Password:     "newpassword123",
-			Organization: "Test Org",
+			Id:             1,
+			Name:           "Updated User",
+			Email:          "updated@example.com",
+			Password:       "newpassword123",
+			OrganizationId: 1,
 		})
 
 		// Проверяем результат
@@ -42,10 +47,10 @@ func TestBaseHandler_UpdateUser(t *testing.T) {
 		assert.Equal(t, int32(1), result.Id)
 		assert.Equal(t, "Updated User", result.Name)
 		assert.Equal(t, "updated@example.com", result.Email)
-		assert.Equal(t, "Test Org", result.Organization)
+		assert.Nil(t, result.Organization)
 
 		// Проверяем, что мок был вызван правильно
-		mockRepo.AssertExpectations(t)
+		userRepo.AssertExpectations(t)
 	})
 
 	// Test 2: Ошибка при отсутствии ID в запросе
@@ -55,11 +60,11 @@ func TestBaseHandler_UpdateUser(t *testing.T) {
 
 		// Вызываем метод UpdateUser с пустым ID
 		result, err := baseHandler.UpdateUser(ctx, &grpc.UserUpdateRequest{
-			Id:           0,
-			Name:         "Updated User",
-			Email:        "updated@example.com",
-			Password:     "newpassword123",
-			Organization: "Test Org",
+			Id:             0,
+			Name:           "Updated User",
+			Email:          "updated@example.com",
+			Password:       "newpassword123",
+			OrganizationId: 1,
 		})
 
 		// Проверяем результат
@@ -96,11 +101,11 @@ func TestBaseHandler_UpdateUser(t *testing.T) {
 
 		// Вызываем метод UpdateUser
 		result, err := baseHandler.UpdateUser(ctx, &grpc.UserUpdateRequest{
-			Id:           1,
-			Name:         "Updated User",
-			Email:        "updated@example.com",
-			Password:     "newpassword123",
-			Organization: "Test Org",
+			Id:             1,
+			Name:           "Updated User",
+			Email:          "updated@example.com",
+			Password:       "newpassword123",
+			OrganizationId: 1,
 		})
 
 		// Проверяем результат

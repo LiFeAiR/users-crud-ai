@@ -396,7 +396,7 @@
           "type": "string"
         },
         "organization": {
-          "type": "string"
+          "$ref": "#/definitions/grpcOrganization"
         }
       }
     },
@@ -412,8 +412,9 @@
         "password": {
           "type": "string"
         },
-        "organization": {
-          "type": "string"
+        "organization_id": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -433,8 +434,9 @@
         "password": {
           "type": "string"
         },
-        "organization": {
-          "type": "string"
+        "organization_id": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

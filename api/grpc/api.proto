@@ -21,14 +21,19 @@ message User {
   string name = 2;
   string email = 3;
   string password = 4;
-  string organization = 5;
+  Organization organization = 5;
+}
+
+message GetUserResponse {
+  User user = 1;
+  Organization organization = 2;
 }
 
 message UserCreateRequest {
   string name = 1;
   string email = 2;
   string password = 3;
-  string organization = 4;
+  int32 organization_id = 4;
 }
 
 message UserUpdateRequest {
@@ -36,7 +41,7 @@ message UserUpdateRequest {
   string name = 2;
   string email = 3;
   string password = 4;
-  string organization = 5;
+  int32 organization_id = 5;
 }
 
 message UsersResponse {

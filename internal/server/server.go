@@ -28,8 +28,8 @@ type Server struct {
 func NewServer(portHttp, portProm string, connStr string) *Server {
 	return &Server{
 		portHTTP: portHttp,
-		portProm: portHttp,
-		connStr:  portHttp,
+		portProm: portProm,
+		connStr:  connStr,
 	}
 }
 

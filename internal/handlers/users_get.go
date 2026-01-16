@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/LiFeAiR/crud-ai/internal/models"
-	"github.com/LiFeAiR/crud-ai/internal/utils"
 	api_pb "github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -43,12 +42,19 @@ func (h *BaseHandler) GetUsers(
 
 	// Отправляем ответ клиенту
 	data := make([]*api_pb.User, len(users))
-	for i, u := range users {
+	for i, user := range users {
+		var orgOut *api_pb.Organization
+		if user.Organization != nil {
+			orgOut = &api_pb.Organization{
+				Id:   int32(user.Organization.ID),
+				Name: user.Organization.Name,
+			}
+		}
 		data[i] = &api_pb.User{
-			Id:           int32(u.ID),
-			Name:         u.Name,
-			Email:        u.Email,
-			Organization: utils.FromPtr(u.Organization),
+			Id:           int32(user.ID),
+			Name:         user.Name,
+			Email:        user.Email,
+			Organization: orgOut,
 		}
 	}
 
