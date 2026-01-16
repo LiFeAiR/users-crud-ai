@@ -392,9 +392,6 @@
         "email": {
           "type": "string"
         },
-        "password": {
-          "type": "string"
-        },
         "organization": {
           "$ref": "#/definitions/grpcOrganization"
         }

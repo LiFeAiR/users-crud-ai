@@ -133,10 +133,10 @@ CREATE TABLE IF NOT EXISTS users (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(255) NOT NULL,
 	email VARCHAR(255) UNIQUE NOT NULL,
-	organization VARCHAR(255)
+    organization_id integer
 );
 alter table users
-    add IF NOT EXISTS organization VARCHAR(255);
+    drop IF EXISTS organization;
 alter table users
     add IF NOT EXISTS organization_id integer;
 `
