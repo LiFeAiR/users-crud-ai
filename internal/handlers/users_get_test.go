@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/internal/models"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ func TestBaseHandler_GetUsers(t *testing.T) {
 	// Test 1: Успешное получение пользователя
 	t.Run("GetUsersSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
 		// Подготавливаем тестовую пользователя
 		testOrg := &models.User{

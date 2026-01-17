@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -17,7 +18,7 @@ func TestBaseHandler_UpdatePermission(t *testing.T) {
 	// Test 1: Успешное обновление права
 	t.Run("UpdatePermissionSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockPermissionRepository)
+		mockRepo := new(mocks.MockPermissionRepository)
 
 		// Определяем ожидаемое поведение мока
 		mockRepo.On("UpdatePermission", ctx, mock.Anything).Return(nil)
@@ -50,7 +51,7 @@ func TestBaseHandler_UpdatePermission(t *testing.T) {
 	// Test 2: Ошибка при обновлении в репозитории
 	t.Run("UpdatePermissionRepositoryError", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockPermissionRepository)
+		mockRepo := new(mocks.MockPermissionRepository)
 
 		// Определяем ожидаемое поведение мока - возвращаем ошибку
 		mockRepo.On("UpdatePermission", ctx, mock.Anything).Return(errors.New("update failed"))

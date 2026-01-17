@@ -58,12 +58,12 @@ func (s *Server) Start(ctx context.Context) error {
 
 	s.db = db
 
-	
-		userRepo := repository.NewUserRepository(db)
-		orgRepo := repository.NewOrganizationRepository(db)
-		permRepo := repository.NewPermissionRepository(db)
-		baseHandler := handlers.NewBaseHandler(userRepo, orgRepo, permRepo, s.secretKey)
-		s.baseHandler = baseHandler
+	userRepo := repository.NewUserRepository(db)
+	orgRepo := repository.NewOrganizationRepository(db)
+	permRepo := repository.NewPermissionRepository(db)
+	roleRepo := repository.NewRoleRepository(db)
+	baseHandler := handlers.NewBaseHandler(userRepo, orgRepo, permRepo, roleRepo, s.secretKey)
+	s.baseHandler = baseHandler
 	defer s.Close()
 
 	grpcServer := grpc.NewServer(

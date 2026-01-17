@@ -5,50 +5,11 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/internal/models"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
-
-// Mock OrganizationRepository для тестирования
-type MockOrganizationRepository struct {
-	mock.Mock
-}
-
-func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, org *models.Organization) (*models.Organization, error) {
-	args := m.Called(ctx, org)
-
-	if o, ok := args.Get(0).(*models.Organization); ok {
-		return o, args.Error(1)
-	}
-
-	return nil, args.Error(1)
-}
-
-func (m *MockOrganizationRepository) GetOrganizationByID(ctx context.Context, id int) (*models.Organization, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).(*models.Organization), args.Error(1)
-}
-
-func (m *MockOrganizationRepository) UpdateOrganization(ctx context.Context, org *models.Organization) error {
-	args := m.Called(ctx, org)
-	return args.Error(0)
-}
-
-func (m *MockOrganizationRepository) DeleteOrganization(ctx context.Context, id int) error {
-	args := m.Called(ctx, id)
-	return args.Error(0)
-}
-
-func (m *MockOrganizationRepository) GetOrganizations(ctx context.Context, limit, offset int) ([]*models.Organization, error) {
-	args := m.Called(ctx, limit, offset)
-	return args.Get(0).([]*models.Organization), args.Error(1)
-}
-
-func (m *MockOrganizationRepository) InitDB() error {
-	panic("implement me")
-}
 
 // TestBaseHandler_GetOrganization тестирует метод GetOrganization базового обработчика
 func TestBaseHandler_GetOrganization(t *testing.T) {
@@ -56,7 +17,7 @@ func TestBaseHandler_GetOrganization(t *testing.T) {
 	// Test 1: Успешное получение организации
 	t.Run("GetOrganizationSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockOrganizationRepository)
+		mockRepo := new(mocks.MockOrganizationRepository)
 
 		// Подготавливаем тестовую организацию
 		testOrg := &models.Organization{
@@ -103,7 +64,7 @@ func TestBaseHandler_GetOrganization(t *testing.T) {
 	// Test 3: Организация не найдена
 	t.Run("GetOrganizationNotFound", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockOrganizationRepository)
+		mockRepo := new(mocks.MockOrganizationRepository)
 
 		// Определяем ожидаемое поведение мока - возвращаем ошибку
 		mockRepo.On("GetOrganizationByID", ctx, 1).Return((*models.Organization)(nil), errors.New("organization not found"))

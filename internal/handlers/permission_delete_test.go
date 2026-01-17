@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,7 +17,7 @@ func TestBaseHandler_DeletePermission(t *testing.T) {
 	// Test 1: Успешное удаление права
 	t.Run("DeletePermissionSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockPermissionRepository)
+		mockRepo := new(mocks.MockPermissionRepository)
 
 		// Определяем ожидаемое поведение мока
 		mockRepo.On("DeletePermission", ctx, 1).Return(nil)
@@ -42,7 +43,7 @@ func TestBaseHandler_DeletePermission(t *testing.T) {
 	// Test 2: Ошибка при удалении в репозитории
 	t.Run("DeletePermissionRepositoryError", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockPermissionRepository)
+		mockRepo := new(mocks.MockPermissionRepository)
 
 		// Определяем ожидаемое поведение мока - возвращаем ошибку
 		mockRepo.On("DeletePermission", ctx, 1).Return(errors.New("delete failed"))

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/internal/models"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func TestBaseHandler_Login(t *testing.T) {
 	// Test 1: Успешная авторизация
 	t.Run("LoginSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
 		// Подготавливаем тестового пользователя
 		expectedUser := &models.User{
@@ -57,7 +58,7 @@ func TestBaseHandler_Login(t *testing.T) {
 	// Test 2: Ошибка при неверных учетных данных
 	t.Run("LoginInvalidCredentials", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
 		// Определяем ожидаемое поведение мока - пользователь не найден
 		mockRepo.On("GetUserByEmail", ctx, "test@example.com").Return((*models.User)(nil), nil)
@@ -85,7 +86,7 @@ func TestBaseHandler_Login(t *testing.T) {
 	// Test 3: Ошибка при проверке пароля
 	t.Run("LoginWrongPassword", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
 		// Подготавливаем тестового пользователя
 		expectedUser := &models.User{
@@ -121,7 +122,7 @@ func TestBaseHandler_Login(t *testing.T) {
 	// Test 4: Ошибка при получении пользователя из репозитория
 	t.Run("LoginRepositoryError", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
 		// Определяем ожидаемое поведение мока - ошибка при получении пользователя
 		mockRepo.On("GetUserByEmail", ctx, "test@example.com").Return((*models.User)(nil), errors.New("database error"))

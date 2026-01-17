@@ -5,46 +5,12 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/internal/models"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
-
-// MockPermissionRepository мок для репозитория прав
-type MockPermissionRepository struct {
-	mock.Mock
-}
-
-func (m *MockPermissionRepository) CreatePermission(ctx context.Context, permission *models.Permission) (*models.Permission, error) {
-	args := m.Called(ctx, permission)
-	return args.Get(0).(*models.Permission), args.Error(1)
-}
-
-func (m *MockPermissionRepository) GetPermissionByID(ctx context.Context, id int) (*models.Permission, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).(*models.Permission), args.Error(1)
-}
-
-func (m *MockPermissionRepository) UpdatePermission(ctx context.Context, permission *models.Permission) error {
-	args := m.Called(ctx, permission)
-	return args.Error(0)
-}
-
-func (m *MockPermissionRepository) DeletePermission(ctx context.Context, id int) error {
-	args := m.Called(ctx, id)
-	return args.Error(0)
-}
-
-func (m *MockPermissionRepository) GetPermissions(ctx context.Context, limit, offset int) ([]*models.Permission, error) {
-	args := m.Called(ctx, limit, offset)
-	return args.Get(0).([]*models.Permission), args.Error(1)
-}
-
-func (m *MockPermissionRepository) InitDB() error {
-	args := m.Called()
-	return args.Error(0)
-}
 
 // TestBaseHandler_CreatePermission тестирует метод CreatePermission базового обработчика
 func TestBaseHandler_CreatePermission(t *testing.T) {
@@ -53,7 +19,7 @@ func TestBaseHandler_CreatePermission(t *testing.T) {
 	// Test 1: Успешное создание права
 	t.Run("CreatePermissionSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockPermissionRepository)
+		mockRepo := new(mocks.MockPermissionRepository)
 
 		// Подготавливаем тестовое право для возврата из репозитория
 		expectedPermission := &models.Permission{
@@ -109,7 +75,7 @@ func TestBaseHandler_CreatePermission(t *testing.T) {
 	// Test 3: Ошибка при неудачном создании в репозитории
 	t.Run("CreatePermissionRepositoryError", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockPermissionRepository)
+		mockRepo := new(mocks.MockPermissionRepository)
 
 		// Определяем ожидаемое поведение мока - возвращаем ошибку
 		mockRepo.On("CreatePermission", ctx, mock.Anything).

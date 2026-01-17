@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/internal/models"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ func TestBaseHandler_GetOrganizations(t *testing.T) {
 	// Test 1: Успешное получение организации
 	t.Run("GetOrganizationsSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockOrganizationRepository)
+		mockRepo := new(mocks.MockOrganizationRepository)
 
 		// Подготавливаем тестовую организацию
 		testOrg := &models.Organization{

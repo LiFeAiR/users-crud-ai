@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/internal/models"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,7 @@ func TestBaseHandler_CreateUser(t *testing.T) {
 	// Test 1: Успешное создание пользователя
 	t.Run("CreateUserSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
 		// Подготавливаем тестового пользователя для возврата из репозитория
 		expectedUser := &models.User{
@@ -57,7 +58,7 @@ func TestBaseHandler_CreateUser(t *testing.T) {
 	// Test 2: Ошибка при неудачном создании в репозитории
 	t.Run("CreateUserRepositoryError", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
 		// Определяем ожидаемое поведение мока - возвращаем ошибку
 		mockRepo.On("CreateUser", ctx, mock.Anything).

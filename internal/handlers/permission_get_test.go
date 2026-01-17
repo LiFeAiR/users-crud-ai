@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/internal/models"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func TestBaseHandler_GetPermission(t *testing.T) {
 	// Test 1: Успешное получение права
 	t.Run("GetPermissionSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockPermissionRepository)
+		mockRepo := new(mocks.MockPermissionRepository)
 
 		// Подготавливаем тестовое право для возврата из репозитория
 		expectedPermission := &models.Permission{
@@ -55,7 +56,7 @@ func TestBaseHandler_GetPermission(t *testing.T) {
 	// Test 2: Ошибка при получении несуществующего права
 	t.Run("GetPermissionNotFound", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockPermissionRepository)
+		mockRepo := new(mocks.MockPermissionRepository)
 
 		// Определяем ожидаемое поведение мока - возвращаем ошибку
 		mockRepo.On("GetPermissionByID", ctx, 999).Return((*models.Permission)(nil), errors.New("permission not found"))

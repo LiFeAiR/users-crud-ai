@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/internal/models"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func TestBaseHandler_GetPermissions(t *testing.T) {
 	// Test 1: Успешное получение списка прав
 	t.Run("GetPermissionsSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockPermissionRepository)
+		mockRepo := new(mocks.MockPermissionRepository)
 
 		// Подготавливаем тестовые права для возврата из репозитория
 		expectedPermissions := []*models.Permission{
@@ -69,7 +70,7 @@ func TestBaseHandler_GetPermissions(t *testing.T) {
 	// Test 2: Ошибка при получении списка прав из репозитория
 	t.Run("GetPermissionsRepositoryError", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockPermissionRepository)
+		mockRepo := new(mocks.MockPermissionRepository)
 
 		// Определяем ожидаемое поведение мока - возвращаем ошибку
 		mockRepo.On("GetPermissions", ctx, 10, 0).Return(([]*models.Permission)(nil), errors.New("get permissions failed"))

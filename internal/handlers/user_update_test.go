@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/internal/models"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
@@ -18,8 +19,8 @@ func TestBaseHandler_UpdateUser(t *testing.T) {
 	// Test 1: Успешное обновление пользователя
 	t.Run("UpdateUserSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		userRepo := new(MockUserRepository)
-		orgRepo := new(MockOrganizationRepository)
+		userRepo := new(mocks.MockUserRepository)
+		orgRepo := new(mocks.MockOrganizationRepository)
 
 		// Определяем ожидаемое поведение мока
 		userRepo.On("UpdateUser", ctx, mock.Anything).Return(nil)
@@ -88,7 +89,7 @@ func TestBaseHandler_UpdateUser(t *testing.T) {
 	// Test 4: Ошибка при неудачном обновлении в репозитории
 	t.Run("UpdateUserRepositoryError", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
 		// Определяем ожидаемое поведение мока - возвращаем ошибку
 		mockRepo.On("UpdateUser", ctx, mock.Anything).

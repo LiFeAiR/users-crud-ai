@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,7 +14,7 @@ func TestDeleteOrganization(t *testing.T) {
 	// Test 1: Успешное удаление организации
 	t.Run("DeleteOrganizationSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockOrganizationRepository)
+		mockRepo := new(mocks.MockOrganizationRepository)
 
 		// Определяем ожидаемое поведение мока
 		mockRepo.On("DeleteOrganization", ctx, 1).Return(nil, nil)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,7 +14,7 @@ func TestDeleteUser(t *testing.T) {
 	// Test 1: Успешное удаление пользователя
 	t.Run("DeleteUserSuccess", func(t *testing.T) {
 		// Создаем мок репозиторий
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
 		// Определяем ожидаемое поведение мока
 		mockRepo.On("DeleteUser", ctx, 1).Return(nil, nil)

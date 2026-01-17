@@ -22,27 +22,61 @@ message User {
   string email = 3;
   Organization organization = 4;
 }
-  
+
 message Permission {
   int32 id = 1;
   string name = 2;
   string code = 3;
   string description = 4;
 }
-  
+
+message Role {
+  int32 id = 1;
+  string name = 2;
+  string code = 3;
+  string description = 4;
+  repeated Permission permissions = 5;
+}
+
 message PermissionCreateRequest {
   string name = 1;
   string code = 2;
   string description = 3;
 }
-  
+
+message RoleCreateRequest {
+  string name = 1;
+  string code = 2;
+  string description = 3;
+}
+
+message RoleUpdateRequest {
+  int32 id = 1;
+  string name = 2;
+  string code = 3;
+  string description = 4;
+}
+
+message RolesResponse {
+  repeated Role data = 1;
+}
+
+message RolePermissionsRequest {
+  int32 role_id = 1;
+  repeated int32 permission_ids = 2;
+}
+
+message RolePermissionsResponse {
+  repeated Permission data = 1;
+}
+
 message PermissionUpdateRequest {
   int32 id = 1;
   string name = 2;
   string code = 3;
   string description = 4;
 }
-  
+
 message PermissionsResponse {
   repeated Permission data = 1;
 }
@@ -81,7 +115,6 @@ message UsersResponse {
   repeated User data = 1;
 }
 
-
 message Organization {
   int32 id = 1;
   string name = 2;
@@ -101,6 +134,14 @@ message OrganizationsResponse {
 }
 
 service CrudService {
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/login"
+      body: "*"
+    };
+  }
+
+  // User CRUD operations
   rpc GetUsers (ListRequest) returns (UsersResponse) {
     option (google.api.http) = {
       get: "/api/users"
@@ -128,12 +169,8 @@ service CrudService {
       delete: "/api/user/{id}"
     };
   }
-  rpc Login (LoginRequest) returns (LoginResponse) {
-    option (google.api.http) = {
-      post: "/api/login"
-      body: "*"
-    };
-  }
+
+  // Organization CRUD operations
   rpc GetOrganizations (ListRequest) returns (OrganizationsResponse) {
     option (google.api.http) = {
       get: "/api/organizations"
@@ -161,7 +198,7 @@ service CrudService {
       delete: "/api/organization/{id}"
     };
   }
-  
+
   // Permission CRUD operations
   rpc CreatePermission (PermissionCreateRequest) returns (Permission) {
     option (google.api.http) = {
@@ -188,6 +225,51 @@ service CrudService {
   rpc GetPermissions (ListRequest) returns (PermissionsResponse) {
     option (google.api.http) = {
       get: "/api/permissions"
+    };
+  }
+
+  // Role CRUD operations
+  rpc CreateRole (RoleCreateRequest) returns (Role) {
+    option (google.api.http) = {
+      post: "/api/roles"
+      body: "*"
+    };
+  }
+  rpc GetRole (Id) returns (Role) {
+    option (google.api.http) = {
+      get: "/api/role/{id}"
+    };
+  }
+  rpc UpdateRole (RoleUpdateRequest) returns (Role) {
+    option (google.api.http) = {
+      put: "/api/role"
+      body: "*"
+    };
+  }
+  rpc DeleteRole (Id) returns (Empty) {
+    option (google.api.http) = {
+      delete: "/api/role/{id}"
+    };
+  }
+
+  // Role permissions operations
+  rpc AddRolePermissions (RolePermissionsRequest) returns (RolePermissionsResponse) {
+    option (google.api.http) = {
+      post: "/api/role/{role_id}/permissions/add"
+      body: "*"
+    };
+  }
+
+  rpc DeleteRolePermissions (RolePermissionsRequest) returns (RolePermissionsResponse) {
+    option (google.api.http) = {
+      post: "/api/role/{role_id}/permissions/delete"
+      body: "*"
+    };
+  }
+
+  rpc GetRoles (ListRequest) returns (RolesResponse) {
+    option (google.api.http) = {
+      get: "/api/roles"
     };
   }
 }

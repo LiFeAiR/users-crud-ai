@@ -37,3 +37,16 @@ type PermissionRepository interface {
 	GetPermissions(ctx context.Context, limit, offset int) ([]*models.Permission, error)
 	InitDB() error
 }
+
+// RoleRepository интерфейс для работы с ролями
+type RoleRepository interface {
+	CreateRole(ctx context.Context, role *models.Role) (*models.Role, error)
+	GetRoleByID(ctx context.Context, id int) (*models.Role, error)
+	UpdateRole(ctx context.Context, role *models.Role) error
+	DeleteRole(ctx context.Context, id int) error
+	GetRoles(ctx context.Context, limit, offset int) ([]*models.Role, error)
+	GetRoleWithPermissions(ctx context.Context, id int) (*models.Role, error)
+	AddRolePermissions(ctx context.Context, roleID int, permissionIDs []int) error
+	DeleteRolePermissions(ctx context.Context, roleID int, permissionIDs []int) error
+	InitDB() error
+}
