@@ -10,7 +10,7 @@
 │   ├── grpc/
 │   │   └── api.proto        # gRPC API спецификация
 │   └── openapi/
-│       └── api.yaml[api.swagger.json](api/openapi/api.swagger.json) # Спецификация OpenAPI
+│       └── api.swagger.json # Спецификация OpenAPI
 ├── build/                   # Конфигурации сборки и развёртывания
 │   ├── .env                 # Переменные окружения для Docker Compose
 │   └── docker-compose.yml   # Конфигурация Docker Compose для базы данных PostgreSQL
