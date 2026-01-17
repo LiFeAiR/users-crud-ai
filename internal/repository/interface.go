@@ -15,6 +15,12 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, user *models.User) error
 	DeleteUser(ctx context.Context, id int) error
 	GetUsers(ctx context.Context, limit, offset int) ([]*models.User, error)
+	GetUserPermissions(ctx context.Context, userID int) ([]*models.Permission, error)
+	AddUserPermissions(ctx context.Context, userID int, permissionIDs []int) error
+	DeleteUserPermissions(ctx context.Context, userID int, permissionIDs []int) error
+	GetUserRoles(ctx context.Context, userID int) ([]*models.Role, error)
+	AddUserRoles(ctx context.Context, userID int, roleIDs []int) error
+	DeleteUserRoles(ctx context.Context, userID int, roleIDs []int) error
 	InitDB() error
 }
 

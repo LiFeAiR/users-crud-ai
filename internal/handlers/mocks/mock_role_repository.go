@@ -13,13 +13,13 @@ type MockRoleRepository struct {
 }
 
 func (m *MockRoleRepository) AddRolePermissions(ctx context.Context, roleID int, permissionIDs []int) error {
-	//TODO implement me
-	panic("implement me")
+	args := m.Called(ctx, roleID, permissionIDs)
+	return args.Error(0)
 }
 
 func (m *MockRoleRepository) DeleteRolePermissions(ctx context.Context, roleID int, permissionIDs []int) error {
-	//TODO implement me
-	panic("implement me")
+	args := m.Called(ctx, roleID, permissionIDs)
+	return args.Error(0)
 }
 
 func (m *MockRoleRepository) CreateRole(ctx context.Context, role *models.Role) (*models.Role, error) {

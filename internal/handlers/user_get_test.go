@@ -27,6 +27,12 @@ func TestBaseHandler_GetUser(t *testing.T) {
 
 		// Определяем ожидаемое поведение мока
 		mockRepo.On("GetUserByID", ctx, 1).Return(testUser, nil)
+		mockRepo.On("GetUserPermissions", ctx, 1).Return([]*models.Permission{{
+			ID:          0,
+			Name:        "1",
+			Code:        "2",
+			Description: "3",
+		}}, nil)
 
 		// Создаем базовый обработчик с моком
 		baseHandler := &BaseHandler{
@@ -41,6 +47,7 @@ func TestBaseHandler_GetUser(t *testing.T) {
 		assert.NotNil(t, u)
 		assert.Equal(t, int32(1), u.Id)
 		assert.Equal(t, "Test Org", u.Name)
+		assert.Len(t, u.Permissions, 1)
 
 		// Проверяем, что мок был вызван правильно
 		mockRepo.AssertExpectations(t)

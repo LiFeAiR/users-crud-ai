@@ -34,11 +34,26 @@ func (bh *BaseHandler) GetUser(ctx context.Context, in *api_pb.Id) (out *api_pb.
 		}
 	}
 
+	// Получаем обновленного пользователя с правами
+	permissions, err := bh.userRepo.GetUserPermissions(ctx, int(in.Id))
+
+	// Формируем ответ
+	var permissionsOut []*api_pb.Permission
+	for _, permission := range permissions {
+		permissionsOut = append(permissionsOut, &api_pb.Permission{
+			Id:          int32(permission.ID),
+			Name:        permission.Name,
+			Code:        permission.Code,
+			Description: permission.Description,
+		})
+	}
+
 	// Возвращаем ответ
 	return &api_pb.User{
 		Id:           int32(user.ID),
 		Name:         user.Name,
 		Email:        user.Email,
 		Organization: orgOut,
+		Permissions:  permissionsOut,
 	}, nil
 }

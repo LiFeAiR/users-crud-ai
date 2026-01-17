@@ -12,6 +12,36 @@ type MockUserRepository struct {
 	mock.Mock
 }
 
+func (m *MockUserRepository) GetUserPermissions(ctx context.Context, userID int) ([]*models.Permission, error) {
+	args := m.Called(ctx, userID)
+	return args.Get(0).([]*models.Permission), args.Error(1)
+}
+
+func (m *MockUserRepository) AddUserPermissions(ctx context.Context, userID int, permissionIDs []int) error {
+	args := m.Called(ctx, userID, permissionIDs)
+	return args.Error(0)
+}
+
+func (m *MockUserRepository) DeleteUserPermissions(ctx context.Context, userID int, permissionIDs []int) error {
+	args := m.Called(ctx, userID, permissionIDs)
+	return args.Error(0)
+}
+
+func (m *MockUserRepository) GetUserRoles(ctx context.Context, userID int) ([]*models.Role, error) {
+	args := m.Called(ctx, userID)
+	return args.Get(0).([]*models.Role), args.Error(1)
+}
+
+func (m *MockUserRepository) AddUserRoles(ctx context.Context, userID int, roleIDs []int) error {
+	args := m.Called(ctx, userID, roleIDs)
+	return args.Error(0)
+}
+
+func (m *MockUserRepository) DeleteUserRoles(ctx context.Context, userID int, roleIDs []int) error {
+	args := m.Called(ctx, userID, roleIDs)
+	return args.Error(0)
+}
+
 func (m *MockUserRepository) CheckPassword(ctx context.Context, userID int, password string) (bool, error) {
 	args := m.Called(ctx, userID, password)
 	return args.Bool(0), args.Error(1)

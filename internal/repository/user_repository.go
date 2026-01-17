@@ -181,6 +181,150 @@ func (r *userRepository) GetUsers(ctx context.Context, limit, offset int) ([]*mo
 	return users, nil
 }
 
+// GetUserPermissions получает права пользователя
+func (r *userRepository) GetUserPermissions(ctx context.Context, userID int) ([]*models.Permission, error) {
+	// TODO Сложно!!
+	query := `
+		SELECT DISTINCT p.id, p.name, p.code, p.description
+		FROM permissions p
+			LEFT JOIN user_permissions up ON p.id = up.permission_id and up.user_id = $1
+			LEFT JOIN user_roles ur ON ur.user_id = $1
+			LEFT JOIN role_permissions rp ON rp.role_id = ur.role_id and p.id = rp.permission_id
+		WHERE ur.user_id = $1 or up.user_id = $1
+		ORDER BY p.id`
+	rows, err := r.db.GetConnection().Query(ctx, query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user permissions: %w", err)
+	}
+	defer rows.Close()
+
+	var permissions []*models.Permission
+	for rows.Next() {
+		permission := &models.Permission{}
+		err := rows.Scan(&permission.ID, &permission.Name, &permission.Code, &permission.Description)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan permission: %w", err)
+		}
+		permissions = append(permissions, permission)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate permissions: %w", err)
+	}
+
+	return permissions, nil
+}
+
+// AddUserPermissions добавляет права пользователю
+func (r *userRepository) AddUserPermissions(ctx context.Context, userID int, permissionIDs []int) error {
+	// Проверяем, существуют ли все указанные права
+	query := `SELECT COUNT(*) FROM permissions WHERE id = ANY($1)`
+	var count int
+	err := r.db.GetConnection().QueryRow(ctx, query, permissionIDs).Scan(&count)
+	if err != nil {
+		return fmt.Errorf("failed to check permissions: %w", err)
+	}
+
+	// Если количество найденных прав не совпадает с количеством запрошенных, значит некоторые права не существуют
+	if count != len(permissionIDs) {
+		return fmt.Errorf("some permissions do not exist")
+	}
+
+	// Добавляем права пользователю
+	for _, permissionID := range permissionIDs {
+		query = `INSERT INTO user_permissions (user_id, permission_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`
+		_, err := r.db.GetConnection().Exec(ctx, query, userID, permissionID)
+		if err != nil {
+			return fmt.Errorf("failed to add permission to user: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// DeleteUserPermissions удаляет права у пользователя
+func (r *userRepository) DeleteUserPermissions(ctx context.Context, userID int, permissionIDs []int) error {
+	// Удаляем права у пользователя
+	query := `DELETE FROM user_permissions WHERE user_id = $1 AND permission_id = ANY($2)`
+	_, err := r.db.GetConnection().Exec(ctx, query, userID, permissionIDs)
+	if err != nil {
+		return fmt.Errorf("failed to delete user permissions: %w", err)
+	}
+
+	return nil
+}
+
+// GetUserRoles получает роли пользователя
+func (r *userRepository) GetUserRoles(ctx context.Context, userID int) ([]*models.Role, error) {
+	query := `
+		SELECT r.id, r.name, r.code, r.description
+		FROM roles r
+		JOIN user_roles ur ON r.id = ur.role_id
+		WHERE ur.user_id = $1
+		ORDER BY r.id
+	`
+	rows, err := r.db.GetConnection().Query(ctx, query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user roles: %w", err)
+	}
+	defer rows.Close()
+
+	var roles []*models.Role
+	for rows.Next() {
+		role := &models.Role{}
+		err := rows.Scan(&role.ID, &role.Name, &role.Code, &role.Description)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan role: %w", err)
+		}
+		roles = append(roles, role)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate roles: %w", err)
+	}
+
+	return roles, nil
+}
+
+// AddUserRoles добавляет роли пользователю
+func (r *userRepository) AddUserRoles(ctx context.Context, userID int, roleIDs []int) error {
+	// Проверяем, существуют ли все указанные роли
+	query := `SELECT COUNT(*) FROM roles WHERE id = ANY($1)`
+	var count int
+	err := r.db.GetConnection().QueryRow(ctx, query, roleIDs).Scan(&count)
+	if err != nil {
+		return fmt.Errorf("failed to check roles: %w", err)
+	}
+
+	// Если количество найденных ролей не совпадает с количеством запрошенных, значит некоторые роли не существуют
+	if count != len(roleIDs) {
+		return fmt.Errorf("some roles do not exist")
+	}
+
+	// Добавляем роли пользователю
+	for _, roleID := range roleIDs {
+		query = `INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`
+		_, err := r.db.GetConnection().Exec(ctx, query, userID, roleID)
+		if err != nil {
+			return fmt.Errorf("failed to add role to user: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// DeleteUserRoles удаляет роли у пользователя
+func (r *userRepository) DeleteUserRoles(ctx context.Context, userID int, roleIDs []int) error {
+	// Удаляем роли у пользователя
+	query := `DELETE FROM user_roles WHERE user_id = $1 AND role_id = ANY($2)`
+	_, err := r.db.GetConnection().Exec(ctx, query, userID, roleIDs)
+	if err != nil {
+		return fmt.Errorf("failed to delete user roles: %w", err)
+	}
+
+	return nil
+}
+
 // InitDB инициализирует таблицы в БД
 func (r *userRepository) InitDB() error {
 	query := `
@@ -197,6 +341,20 @@ alter table users
     add IF NOT EXISTS organization_id integer;
 alter table users
     add IF NOT EXISTS password_hash TEXT;
+
+-- Таблица для связи пользователей и прав
+CREATE TABLE IF NOT EXISTS user_permissions (
+	user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+	permission_id INTEGER REFERENCES permissions(id) ON DELETE CASCADE,
+	PRIMARY KEY (user_id, permission_id)
+);
+
+-- Таблица для связи пользователей и ролей
+CREATE TABLE IF NOT EXISTS user_roles (
+	user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+	role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
+	PRIMARY KEY (user_id, role_id)
+);
 `
 	_, err := r.db.GetConnection().Exec(context.Background(), query)
 	if err != nil {

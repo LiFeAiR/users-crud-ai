@@ -298,6 +298,7 @@
     },
     "/api/permissions": {
       "get": {
+        "summary": "Permission CRUD operations",
         "operationId": "CrudService_GetPermissions",
         "responses": {
           "200": {
@@ -334,7 +335,6 @@
         ]
       },
       "post": {
-        "summary": "Permission CRUD operations",
         "operationId": "CrudService_CreatePermission",
         "responses": {
           "200": {
@@ -538,6 +538,7 @@
     },
     "/api/roles": {
       "get": {
+        "summary": "Role CRUD operations",
         "operationId": "CrudService_GetRoles",
         "responses": {
           "200": {
@@ -574,7 +575,6 @@
         ]
       },
       "post": {
-        "summary": "Role CRUD operations",
         "operationId": "CrudService_CreateRole",
         "responses": {
           "200": {
@@ -690,6 +690,164 @@
             "required": true,
             "type": "integer",
             "format": "int32"
+          }
+        ],
+        "tags": [
+          "CrudService"
+        ]
+      }
+    },
+    "/api/user/{user_id}/permissions/add": {
+      "post": {
+        "summary": "User permissions operations",
+        "operationId": "CrudService_AddUserPermissions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/grpcRolePermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/grpcUserPermissionsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CrudService"
+        ]
+      }
+    },
+    "/api/user/{user_id}/permissions/delete": {
+      "post": {
+        "operationId": "CrudService_DeleteUserPermissions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/grpcRolePermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/grpcUserPermissionsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CrudService"
+        ]
+      }
+    },
+    "/api/user/{user_id}/roles/add": {
+      "post": {
+        "summary": "User roles operations",
+        "operationId": "CrudService_AddUserRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/grpcRolesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/grpcUserRolesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CrudService"
+        ]
+      }
+    },
+    "/api/user/{user_id}/roles/delete": {
+      "post": {
+        "operationId": "CrudService_DeleteUserRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/grpcRolesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/grpcUserRolesRequest"
+            }
           }
         ],
         "tags": [
@@ -1006,6 +1164,12 @@
         },
         "organization": {
           "$ref": "#/definitions/grpcOrganization"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/grpcPermission"
+          }
         }
       }
     },
@@ -1024,6 +1188,38 @@
         "organization_id": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "grpcUserPermissionsRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "permission_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "grpcUserRolesRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "role_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
         }
       }
     },
