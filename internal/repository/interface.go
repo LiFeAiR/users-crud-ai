@@ -27,3 +27,13 @@ type OrganizationRepository interface {
 	GetOrganizations(ctx context.Context, limit, offset int) ([]*models.Organization, error)
 	InitDB() error
 }
+
+// PermissionRepository интерфейс для работы с правами
+type PermissionRepository interface {
+	CreatePermission(ctx context.Context, permission *models.Permission) (*models.Permission, error)
+	GetPermissionByID(ctx context.Context, id int) (*models.Permission, error)
+	UpdatePermission(ctx context.Context, permission *models.Permission) error
+	DeletePermission(ctx context.Context, id int) error
+	GetPermissions(ctx context.Context, limit, offset int) ([]*models.Permission, error)
+	InitDB() error
+}

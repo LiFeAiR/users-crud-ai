@@ -8,6 +8,7 @@ import (
 type BaseHandler struct {
 	userRepo  repository.UserRepository
 	orgRepo   repository.OrganizationRepository
+	permRepo  repository.PermissionRepository
 	secretKey string
 }
 
@@ -15,11 +16,13 @@ type BaseHandler struct {
 func NewBaseHandler(
 	userRepo repository.UserRepository,
 	orgRepo repository.OrganizationRepository,
+	permRepo repository.PermissionRepository,
 	secretKey string,
 ) *BaseHandler {
 	return &BaseHandler{
 		userRepo:  userRepo,
 		orgRepo:   orgRepo,
+		permRepo:  permRepo,
 		secretKey: secretKey,
 	}
 }

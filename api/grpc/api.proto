@@ -22,6 +22,30 @@ message User {
   string email = 3;
   Organization organization = 4;
 }
+  
+message Permission {
+  int32 id = 1;
+  string name = 2;
+  string code = 3;
+  string description = 4;
+}
+  
+message PermissionCreateRequest {
+  string name = 1;
+  string code = 2;
+  string description = 3;
+}
+  
+message PermissionUpdateRequest {
+  int32 id = 1;
+  string name = 2;
+  string code = 3;
+  string description = 4;
+}
+  
+message PermissionsResponse {
+  repeated Permission data = 1;
+}
 
 message GetUserResponse {
   User user = 1;
@@ -135,6 +159,35 @@ service CrudService {
   rpc DeleteOrganization (Id) returns (Empty) {
     option (google.api.http) = {
       delete: "/api/organization/{id}"
+    };
+  }
+  
+  // Permission CRUD operations
+  rpc CreatePermission (PermissionCreateRequest) returns (Permission) {
+    option (google.api.http) = {
+      post: "/api/permissions"
+      body: "*"
+    };
+  }
+  rpc GetPermission (Id) returns (Permission) {
+    option (google.api.http) = {
+      get: "/api/permission/{id}"
+    };
+  }
+  rpc UpdatePermission (PermissionUpdateRequest) returns (Permission) {
+    option (google.api.http) = {
+      put: "/api/permission"
+      body: "*"
+    };
+  }
+  rpc DeletePermission (Id) returns (Empty) {
+    option (google.api.http) = {
+      delete: "/api/permission/{id}"
+    };
+  }
+  rpc GetPermissions (ListRequest) returns (PermissionsResponse) {
+    option (google.api.http) = {
+      get: "/api/permissions"
     };
   }
 }

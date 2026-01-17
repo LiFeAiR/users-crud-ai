@@ -24,6 +24,7 @@ func main() {
 	// Создаем репозиторий пользователей
 	userRepo := repository.NewUserRepository(db)
 	orgRepo := repository.NewOrganizationRepository(db)
+	permRepo := repository.NewPermissionRepository(db)
 
 	// Инициализируем таблицы в БД
 	err = userRepo.InitDB()
@@ -33,6 +34,12 @@ func main() {
 
 	// Инициализируем таблицы в БД
 	err = orgRepo.InitDB()
+	if err != nil {
+		log.Fatal("Failed to initialize database:", err)
+	}
+
+	// Инициализируем таблицы в БД
+	err = permRepo.InitDB()
 	if err != nil {
 		log.Fatal("Failed to initialize database:", err)
 	}
