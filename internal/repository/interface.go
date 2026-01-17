@@ -62,3 +62,16 @@ type RoleRepository interface {
 	DeleteRolePermissions(ctx context.Context, roleID int, permissionIDs []int) error
 	InitDB() error
 }
+
+// TariffRepository интерфейс для работы с тарифами
+type TariffRepository interface {
+	CreateTariff(ctx context.Context, tariff *models.Tariff) (*models.Tariff, error)
+	GetTariffByID(ctx context.Context, id int) (*models.Tariff, error)
+	UpdateTariff(ctx context.Context, tariff *models.Tariff) error
+	DeleteTariff(ctx context.Context, id int) error
+	GetTariffs(ctx context.Context, limit, offset int) ([]*models.Tariff, error)
+	GetTariffWithRoles(ctx context.Context, id int) (*models.Tariff, error)
+	AddTariffRoles(ctx context.Context, tariffID int, roleIDs []int) error
+	DeleteTariffRoles(ctx context.Context, tariffID int, roleIDs []int) error
+	InitDB() error
+}

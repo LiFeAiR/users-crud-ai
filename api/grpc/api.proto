@@ -77,6 +77,11 @@ message OrganizationRolesRequest {
   repeated int32 role_ids = 2;
 }
 
+message TariffRolesRequest {
+  int32 id = 1;
+  repeated int32 role_ids = 2;
+}
+
 message OrganizationPermissionsRequest {
   int32 id = 1;
   repeated int32 permission_ids = 2;
@@ -89,6 +94,31 @@ message RolePermissionsRequest {
 
 message RolePermissionsResponse {
   repeated Permission data = 1;
+}
+
+message Tariff {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 price = 4;
+  repeated Role roles = 5;
+}
+
+message TariffCreateRequest {
+  string name = 1;
+  string description = 2;
+  int32 price = 3;
+}
+
+message TariffUpdateRequest {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 price = 4;
+}
+
+message TariffsResponse {
+  repeated Tariff data = 1;
 }
 
 message PermissionUpdateRequest {
@@ -346,6 +376,49 @@ service CrudService {
   rpc DeleteRolePermissions (RolePermissionsRequest) returns (RolePermissionsResponse) {
     option (google.api.http) = {
       post: "/api/role/{id}/permissions/delete"
+      body: "*"
+    };
+  }
+
+  // Tariff CRUD operations
+  rpc GetTariffs (ListRequest) returns (TariffsResponse) {
+    option (google.api.http) = {
+      get: "/api/tariffs"
+    };
+  }
+  rpc CreateTariff (TariffCreateRequest) returns (Tariff) {
+    option (google.api.http) = {
+      post: "/api/tariffs"
+      body: "*"
+    };
+  }
+  rpc GetTariff (Id) returns (Tariff) {
+    option (google.api.http) = {
+      get: "/api/tariff/{id}"
+    };
+  }
+  rpc UpdateTariff (TariffUpdateRequest) returns (Tariff) {
+    option (google.api.http) = {
+      put: "/api/tariff"
+      body: "*"
+    };
+  }
+  rpc DeleteTariff (Id) returns (Empty) {
+    option (google.api.http) = {
+      delete: "/api/tariff/{id}"
+    };
+  }
+
+  // Tariff roles operations
+  rpc AddTariffRoles (TariffRolesRequest) returns (RolesResponse) {
+    option (google.api.http) = {
+      post: "/api/tariff/{id}/roles/add"
+      body: "*"
+    };
+  }
+  rpc DeleteTariffRoles (TariffRolesRequest) returns (RolesResponse) {
+    option (google.api.http) = {
+      post: "/api/tariff/{id}/roles/delete"
       body: "*"
     };
   }

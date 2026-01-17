@@ -26,6 +26,7 @@ func main() {
 	orgRepo := repository.NewOrganizationRepository(db)
 	permRepo := repository.NewPermissionRepository(db)
 	roleRepo := repository.NewRoleRepository(db)
+	tariffRepo := repository.NewTariffRepository(db)
 
 	// Инициализируем таблицы в БД
 	err = userRepo.InitDB()
@@ -44,9 +45,15 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to initialize database:", err)
 	}
-	
+
 	// Инициализируем таблицы в БД
 	err = roleRepo.InitDB()
+	if err != nil {
+		log.Fatal("Failed to initialize database:", err)
+	}
+
+	// Инициализируем таблицы в БД
+	err = tariffRepo.InitDB()
 	if err != nil {
 		log.Fatal("Failed to initialize database:", err)
 	}

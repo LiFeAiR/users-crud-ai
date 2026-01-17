@@ -62,7 +62,8 @@ func (s *Server) Start(ctx context.Context) error {
 	orgRepo := repository.NewOrganizationRepository(db)
 	permRepo := repository.NewPermissionRepository(db)
 	roleRepo := repository.NewRoleRepository(db)
-	baseHandler := handlers.NewBaseHandler(userRepo, orgRepo, permRepo, roleRepo, s.secretKey)
+	tarifRepo := repository.NewTariffRepository(db)
+	baseHandler := handlers.NewBaseHandler(userRepo, orgRepo, permRepo, roleRepo, tarifRepo, s.secretKey)
 	s.baseHandler = baseHandler
 	defer s.Close()
 
