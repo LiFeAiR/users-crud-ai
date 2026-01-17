@@ -1,125 +1,228 @@
-# HTTP Server with Database Connection and REST API
+# HTTP Сервер с подключением к базе данных и REST API
 
-This is a REST API server implementation with database connection capabilities.
+Это реализация REST API сервера с возможностями подключения к базе данных.
 
-## Project Structure
+## Структура проекта
 
 ```
 .
 ├── api/
+│   ├── grpc/
+│   │   └── api.proto        # gRPC API спецификация
 │   └── openapi/
-│       └── api.yaml         # OpenAPI specification
-├── build/                   # Build and deployment configurations
-│   ├── .env                 # Environment variables for Docker Compose
-│   └── docker-compose.yml   # Docker Compose configuration for PostgreSQL database
+│       └── api.yaml[api.swagger.json](api/openapi/api.swagger.json) # Спецификация OpenAPI
+├── build/                   # Конфигурации сборки и развёртывания
+│   ├── .env                 # Переменные окружения для Docker Compose
+│   └── docker-compose.yml   # Конфигурация Docker Compose для базы данных PostgreSQL
 ├── cmd/
 │   ├── app/
-│   │   └── main.go          # Main entry point
+│   │   └── main.go          # Главная точка входа
 │   └── cli/
-│       └── main.go          # CLI entry point
+│       └── main.go          # Точка входа CLI
 ├── internal/
-│   ├── handlers/            # HTTP handlers
-│   ├── models/              # Data models
-│   │   ├── organization.go  # Organization data model
-│   │   └── user.go          # User data model
-│   ├── repository/          # Database connection and repositories
-│   │   ├── db.go            # Database connection class
-│   │   ├── interface.go     # Repository interface
-│   │   ├── organization_repository.go  # Organization repository implementation
-│   │   └── user_repository.go    # User repository implementation
-│   └── server/              # HTTP server implementation
-└── go.mod                   # Go modules file
+│   ├── handlers/            # HTTP обработчики
+│   ├── models/              # Модели данных
+│   │   ├── organization.go  # Модель данных организации
+│   │   ├── permission.go    # Модель данных прав
+│   │   ├── role.go          # Модель данных ролей
+│   │   ├── tariff.go        # Модель данных тарифов
+│   │   └── user.go          # Модель данных пользователя
+│   ├── repository/          # Подключение к базе данных и репозитории
+│   │   ├── db.go            # Класс подключения к базе данных
+│   │   ├── interface.go     # Интерфейс репозитория
+│   │   ├── organization_repository.go  # Реализация репозитория организации
+│   │   ├── permission_repository.go    # Реализация репозитория прав
+│   │   ├── role_repository.go    # Реализация репозитория ролей
+│   │   ├── tariff_repository.go    # Реализация репозитория тарифов
+│   │   └── user_repository.go    # Реализация репозитория пользователя
+│   └── server/              # Реализация HTTP сервера
+└── go.mod                   # Файл модулей Go
 ```
 
-## Build and Deployment
+## Сборка и развёртывание
 
-The `build` directory contains configuration files for building and deploying the application with Docker Compose and PostgreSQL:
+Каталог `build` содержит конфигурационные файлы для сборки и развёртывания приложения с использованием Docker Compose и PostgreSQL:
 
-- `.env`: Environment variables for database and pgAdmin configuration
-- `docker-compose.yml`: Docker Compose configuration that sets up PostgreSQL database service
+- `.env`: Переменные окружения для настройки базы данных и pgAdmin
+- `docker-compose.yml`: Конфигурация Docker Compose, которая настраивает службу базы данных PostgreSQL
 
-These files allow you to easily spin up the entire application environment with a single command using Docker Compose.
+Эти файлы позволяют легко запустить всё приложение с помощью одной команды с использованием Docker Compose.
 
-## Database Connection Class
+## Класс подключения к базе данных
 
-The database connection class is located in `internal/repository/db.go`. It provides:
+Класс подключения к базе данных находится в `internal/repository/db.go`. Он предоставляет:
 
-- Connection to PostgreSQL database using github.com/jackc/pgx/v5
-- Connection validation
-- Methods for getting and closing database connection
+- Подключение к базе данных PostgreSQL с использованием github.com/jackc/pgx/v5
+- Проверку подключения
+- Методы для получения и закрытия подключения к базе данных
 
-### Usage Example
+### Пример использования
 
 ```go
-// Create new database connection
+// Создать новое подключение к базе данных
 db, err := repository.NewDB("host=localhost port=5432 user=postgres password=postgres dbname=testdb sslmode=disable")
 if err != nil {
-log.Fatal("Failed to connect to database:", err)
+log.Fatal("Не удалось подключиться к базе данных:", err)
 }
 defer db.Close()
 
-// Get database connection
+// Получить подключение к базе данных
 connection := db.GetConnection()
 
-// The server manages the database connection lifecycle
-// and passes it to handlers through the base handler
+// Сервер управляет жизненным циклом подключения к базе данных
+// и передаёт его обработчикам через базовый обработчик
 
-Note: In production environments, database connection management should be handled more carefully
-to prevent premature closure of connections. Currently, the connection is closed after
-the Start method completes, which is not ideal for long-running servers.
+Примечание: В продакшн средах управление подключениями к базе данных должно осуществляться более аккуратно,
+чтобы предотвратить преждевременное закрытие соединений. В настоящее время соединение закрывается после
+завершения метода Start, что не идеально для долгоживущих серверов.
 ```
 
-## Repository Pattern Implementation
+## Реализация паттерна репозитория
 
-The project implements repository pattern in `internal/repository/`:
+Проект реализует паттерн репозитория в `internal/repository/`:
 
-- `UserRepository` interface defines methods for user operations (defined in `interface.go`)
-- `userRepository` struct implements the interface (defined in `user_repository.go`)
-- `OrganizationRepository` interface defines methods for organization operations (defined in `interface.go`)
-- `organizationRepository` struct implements the interface (defined in `organization_repository.go`)
-- Both repositories use the same database connection from `db.go`
-- Provides methods for CRUD operations on users and organizations
-- Includes database initialization for both tables
+- Интерфейс `UserRepository` определяет методы для операций с пользователями (определено в `interface.go`)
+- Структура `userRepository` реализует интерфейс (определено в `user_repository.go`)
+- Интерфейс `OrganizationRepository` определяет методы для операций с организациями (определено в `interface.go`)
+- Структура `organizationRepository` реализует интерфейс (определено в `organization_repository.go`)
+- Оба репозитория используют одно и то же подключение к базе данных из `db.go`
+- Предоставляет методы для операций CRUD с пользователями и организациями
+- Включает инициализацию базы данных для обеих таблиц
 
-## Handler Integration
+## Интеграция обработчиков
 
-HTTP handlers in `internal/handlers/` now use the repository pattern through a base handler:
+HTTP обработчики в `internal/handlers/` теперь используют паттерн репозитория через базовый обработчик:
 
-- Base handler receives repository instances for users and organizations
-- Handlers receive the server instance to access database connection
-- The actual repository interaction is delegated to the base handler
-- All handlers are registered via the server in `internal/server/server.go`
+- Базовый обработчик получает экземпляры репозиториев для пользователей и организаций
+- Обработчики получают экземпляр сервера для доступа к подключению к базе данных
+- Фактическое взаимодействие с репозиторием делегируется базовому обработчику
+- Все обработчики регистрируются через сервер в `internal/server/server.go`
 
-## API Endpoints
+## Конечные точки API
 
-The server now supports the following endpoints:
+Сервер теперь поддерживает следующие конечные точки:
 
-`GET /` - Root endpoint
+`GET /` - Корневая конечная точка
 
-### Users
+### Аутентификация
 
-- `GET /api/users` - Get list of users (requires limit and offset query parameters)
-- `GET /api/user` - Get user by ID (requires id query parameter)
-- `POST /api/user` - Create a new user
-- `PUT /api/user` - Update an existing user
-- `DELETE /api/user` - Delete a user
+- `POST /api/login` - Вход пользователя (требуются email и password)
 
-### Organizations
+### Пользователи
 
-- `GET /api/organizations` - Get list of organizations (requires limit and offset query parameters)
-- `GET /api/organization` - Get organization by ID (requires id query parameter)
-- `POST /api/organization` - Create a new organization
-- `PUT /api/organization` - Update an existing organization
-- `DELETE /api/organization` - Delete an organization
+- `GET /api/users` - Получить список пользователей (требуются параметры запроса limit и offset)
+- `GET /api/user/{id}` - Получить пользователя по ID
+- `POST /api/users` - Создать нового пользователя
+- `PUT /api/user` - Обновить существующего пользователя
+- `DELETE /api/user/{id}` - Удалить пользователя
 
-## Getting Started
+### Права (Permissions)
 
-1. Make sure you have Go installed
-2. Install dependencies: `go mod tidy`
-3. Run the server: `go run cmd/app/main.go`
-4. Run the cli: `go run cmd/cli/main.go`
+- `GET /api/permissions` - Получить список прав (требуются параметры запроса limit и offset)
+- `GET /api/permission/{id}` - Получить право по ID
+- `POST /api/permissions` - Создать новое право
+- `PUT /api/permission` - Обновить существующее право
+- `DELETE /api/permission/{id}` - Удалить право
 
-## Фичи
+### Роли (Roles)
+
+- `GET /api/roles` - Получить список ролей (требуются параметры запроса limit и offset)
+- `GET /api/role/{id}` - Получить роль по ID
+- `POST /api/roles` - Создать новую роль
+- `PUT /api/role` - Обновить существующую роль
+- `DELETE /api/role/{id}` - Удалить роль
+
+### Организации
+
+- `GET /api/organizations` - Получить список организаций (требуются параметры запроса limit и offset)
+- `GET /api/organization/{id}` - Получить организацию по ID
+- `POST /api/organizations` - Создать новую организацию
+- `PUT /api/organization` - Обновить существующую организацию
+- `DELETE /api/organization/{id}` - Удалить организацию
+
+### Тарифы (Tariffs)
+
+- `GET /api/tariffs` - Получить список тарифов (требуются параметры запроса limit и offset)
+- `GET /api/tariff/{id}` - Получить тариф по ID
+- `POST /api/tariffs` - Создать новый тариф
+- `PUT /api/tariff` - Обновить существующий тариф
+- `DELETE /api/tariff/{id}` - Удалить тариф
+
+### Управление правами пользователей
+
+- `POST /api/user/{id}/permissions/add` - Добавить права пользователю
+- `POST /api/user/{id}/permissions/delete` - Удалить права у пользователя
+
+### Управление ролями пользователей
+
+- `POST /api/user/{id}/roles/add` - Добавить роли пользователю
+- `POST /api/user/{id}/roles/delete` - Удалить роли у пользователя
+
+### Управление правами организаций
+
+- `POST /api/organization/{id}/permissions/add` - Добавить права организации
+- `POST /api/organization/{id}/permissions/delete` - Удалить права у организации
+
+### Управление ролями организаций
+
+- `POST /api/organization/{id}/roles/add` - Добавить роли организации
+- `POST /api/organization/{id}/roles/delete` - Удалить роли у организации
+
+### Управление правами ролей
+
+- `POST /api/role/{id}/permissions/add` - Добавить права роли
+- `POST /api/role/{id}/permissions/delete` - Удалить права у роли
+
+### Управление ролями тарифов
+
+- `POST /api/tariff/{id}/roles/add` - Добавить роли тарифу
+- `POST /api/tariff/{id}/roles/delete` - Удалить роли у тарифа
+
+## Начало работы
+
+1. Убедитесь, что у вас установлен Go
+2. Установите зависимости: `go mod tidy`
+3. Запустите сервер: `go run cmd/app/main.go`
+4. Запустите cli: `go run cmd/cli/main.go`
+
+## Примеры использования
+
+### Аутентификация
+```bash
+curl -X POST http://localhost:8080/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"password"}'
+```
+
+### Создание пользователя
+```bash
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John Doe","email":"john@example.com","password":"password","organization_id":1}'
+```
+
+### Создание организации
+```bash
+curl -X POST http://localhost:8080/api/organizations \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Example Corp"}'
+```
+
+### Создание роли
+```bash
+curl -X POST http://localhost:8080/api/roles \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Manager","code":"manager","description":"Organization manager"}'
+```
+
+### Назначение роли пользователю
+```bash
+curl -X POST http://localhost:8080/api/user/1/roles/add \
+  -H "Content-Type: application/json" \
+  -d '{"id":1,"role_ids":[1]}'
+```
+
+## Особенности
 
 1. Связь пользователя и организации
   - нельзя удалить организацию, если она связана с пользователем
@@ -127,16 +230,16 @@ The server now supports the following endpoints:
   - может быть пользователь без организации
   - пользователь может состоять в нескольких организациях
 2. ✅ Сохранение паролей в безопасном виде
-3. ✅ Авторизация пользователя по паролю (id/email+password -> jwt)
+3. ✅ Авторизация пользователя по паролю (email+password -> jwt)
 4. Пользователь может редактировать только свои данные
-5. ✅ Права
-6. ✅ Роли (одна роль может содержать несколько прав)
+5. ✅ Права (permissions)
+6. ✅ Роли (roles) - одна роль может содержать несколько прав
 7. ✅ Пользователь может получить определенный набор прав (по одному или пачкой получив роль)
 8. Права отображаются в jwt
 9. Пользователь с правом "Администратор" может редактировать всех пользователей
 10. ✅ Организация может получить определенный набор прав (по одному или пачкой получив роль)
 11. Пользователь с правом "Администратор" внутри организации, может редактировать всех пользователей в ней (кроме пароля)
-12. ✅ Тарифы
+12. ✅ Тарифы (tariffs)
 13. ✅ Тарифы могут предоставлять ~~права~~ или роли с правами
 14. Тарифы связаны с организациями и пользователями
 15. Можно иметь несколько тарифов
