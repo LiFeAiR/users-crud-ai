@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/LiFeAiR/crud-ai/internal/models"
+	"github.com/LiFeAiR/crud-ai/internal/utils"
 	api_pb "github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,16 +18,25 @@ func (bh *BaseHandler) CreateUser(ctx context.Context, in *api_pb.UserCreateRequ
 		org = &models.Organization{ID: int(in.GetOrganizationId())}
 	}
 
+	// Validate request
+	// TODO валидация на сложный пароль
+	if in.Password == "" || len(in.Password) < 5 {
+		log.Println("Failed to validate password")
+		return nil, status.Error(codes.InvalidArgument, "Invalid argument")
+	}
+
+	// Хешируем пароль перед сохранением
+	hash, err := utils.HashPassword(in.Password)
+	if err != nil {
+		log.Printf("Failed to hash password, err:%v\n", err)
+		return nil, status.Error(codes.Internal, "Failed to create user")
+	}
+
 	user := models.User{
 		Name:         in.Name,
 		Email:        in.Email,
-		Password:     in.Password,
+		PasswordHash: hash,
 		Organization: org,
-	}
-
-	// Validate request
-	if false {
-		return nil, status.Error(codes.InvalidArgument, "Invalid argument")
 	}
 
 	// Используем репозиторий для создания пользователя

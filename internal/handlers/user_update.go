@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/LiFeAiR/crud-ai/internal/models"
+	"github.com/LiFeAiR/crud-ai/internal/utils"
 	api_pb "github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -22,12 +23,29 @@ func (bh *BaseHandler) UpdateUser(ctx context.Context, in *api_pb.UserUpdateRequ
 		org = &models.Organization{ID: int(in.GetOrganizationId())}
 	}
 
+	// TODO валидация на сложный пароль
+	if in.Password != "" && len(in.Password) < 5 {
+		log.Println("Failed to validate password")
+		return nil, status.Error(codes.InvalidArgument, "Invalid argument")
+	}
+
+	// Если указан пароль, хешируем его перед сохранением
+	var passwordHash string
+	if in.Password != "" {
+		hash, err := utils.HashPassword(in.Password)
+		if err != nil {
+			log.Printf("Failed to hash password, err:%v\n", err)
+			return nil, status.Error(codes.Internal, "Failed to update user")
+		}
+		passwordHash = hash
+	}
+
 	// Преобразуем запрос в модель
 	user := models.User{
 		ID:           int(in.Id),
 		Name:         in.Name,
 		Email:        in.Email,
-		Password:     in.Password,
+		PasswordHash: passwordHash,
 		Organization: org,
 	}
 

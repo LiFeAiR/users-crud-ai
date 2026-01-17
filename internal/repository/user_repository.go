@@ -21,14 +21,30 @@ func NewUserRepository(db *DB) UserRepository {
 	return &userRepository{db: db}
 }
 
+// CheckPassword проверяет пароль пользователя по хешу
+func (r *userRepository) CheckPassword(ctx context.Context, userID int, password string) (bool, error) {
+	query := `SELECT password_hash FROM users WHERE id = $1`
+	var hash string
+	err := r.db.GetConnection().QueryRow(ctx, query, userID).Scan(&hash)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return false, nil
+		}
+		return false, fmt.Errorf("failed to get user password hash: %w", err)
+	}
+
+	// Используем функцию из utils для сравнения
+	return utils.CheckPassword(password, hash), nil
+}
+
 // CreateUser создает нового пользователя
 func (r *userRepository) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
-	query := `INSERT INTO users (name, email, organization_id) VALUES ($1, $2, $3) RETURNING id`
+	query := `INSERT INTO users (name, email, password_hash, organization_id) VALUES ($1, $2, $3, $4) RETURNING id`
 	var org interface{}
 	if user.Organization != nil {
 		org = user.Organization.ID
 	}
-	err := r.db.GetConnection().QueryRow(ctx, query, user.Name, user.Email, org).Scan(&user.ID)
+	err := r.db.GetConnection().QueryRow(ctx, query, user.Name, user.Email, user.PasswordHash, org).Scan(&user.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
@@ -62,14 +78,28 @@ func (r *userRepository) GetUserByID(ctx context.Context, id int) (*models.User,
 
 // UpdateUser обновляет информацию о пользователе
 func (r *userRepository) UpdateUser(ctx context.Context, user *models.User) error {
-	query := `UPDATE users SET name = $1, email = $2, organization_id = $3 WHERE id = $4`
-	var orgId sql.NullInt32
-	if user.Organization != nil {
-		orgId = utils.NewNullInt32(int32(user.Organization.ID))
-	}
-	_, err := r.db.GetConnection().Exec(ctx, query, user.Name, user.Email, orgId, user.ID)
-	if err != nil {
-		return fmt.Errorf("failed to update user: %w", err)
+	// Если пароль не пустой, обновляем и хеш пароля
+	if user.PasswordHash != "" {
+		query := `UPDATE users SET name = $1, email = $2, password_hash = $3, organization_id = $4 WHERE id = $5`
+		var orgId sql.NullInt32
+		if user.Organization != nil {
+			orgId = utils.NewNullInt32(int32(user.Organization.ID))
+		}
+		_, err := r.db.GetConnection().Exec(ctx, query, user.Name, user.Email, user.PasswordHash, orgId, user.ID)
+		if err != nil {
+			return fmt.Errorf("failed to update user: %w", err)
+		}
+	} else {
+		// Если пароль не указан, обновляем только остальные поля
+		query := `UPDATE users SET name = $1, email = $2, organization_id = $3 WHERE id = $4`
+		var orgId sql.NullInt32
+		if user.Organization != nil {
+			orgId = utils.NewNullInt32(int32(user.Organization.ID))
+		}
+		_, err := r.db.GetConnection().Exec(ctx, query, user.Name, user.Email, orgId, user.ID)
+		if err != nil {
+			return fmt.Errorf("failed to update user: %w", err)
+		}
 	}
 	return nil
 }
@@ -133,12 +163,15 @@ CREATE TABLE IF NOT EXISTS users (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(255) NOT NULL,
 	email VARCHAR(255) UNIQUE NOT NULL,
+	password_hash TEXT,
     organization_id integer
 );
 alter table users
     drop IF EXISTS organization;
 alter table users
     add IF NOT EXISTS organization_id integer;
+alter table users
+    add IF NOT EXISTS password_hash TEXT;
 `
 	_, err := r.db.GetConnection().Exec(context.Background(), query)
 	if err != nil {
