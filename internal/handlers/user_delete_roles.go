@@ -15,18 +15,18 @@ func (bh *BaseHandler) DeleteUserRoles(
 	in *api_pb.UserRolesRequest,
 ) (out *api_pb.RolesResponse, err error) {
 	// Проверяем входные данные
-	if in == nil || in.UserId == 0 || len(in.RoleIds) == 0 {
+	if in == nil || in.Id == 0 || len(in.RoleIds) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "Invalid argument")
 	}
 
 	// Удаляем роли у пользователя
-	if err := bh.userRepo.DeleteUserRoles(ctx, int(in.UserId), convertInt32SliceToInt(in.RoleIds)); err != nil {
+	if err := bh.userRepo.DeleteUserRoles(ctx, int(in.Id), convertInt32SliceToInt(in.RoleIds)); err != nil {
 		log.Printf("delete user roles failed, err:%v\n", err)
 		return nil, status.Error(codes.Internal, "Failed to delete user roles")
 	}
 
 	// Получаем обновленного пользователя с ролями
-	roles, err := bh.userRepo.GetUserRoles(ctx, int(in.UserId))
+	roles, err := bh.userRepo.GetUserRoles(ctx, int(in.Id))
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "User not found")
 	}

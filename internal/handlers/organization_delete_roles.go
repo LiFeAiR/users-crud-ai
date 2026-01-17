@@ -9,26 +9,26 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// AddUserRoles добавляет роли пользователю
-func (bh *BaseHandler) AddUserRoles(
+// DeleteOrganizationRoles удаляет роли из организации
+func (bh *BaseHandler) DeleteOrganizationRoles(
 	ctx context.Context,
-	in *api_pb.UserRolesRequest,
+	in *api_pb.OrganizationRolesRequest,
 ) (out *api_pb.RolesResponse, err error) {
 	// Проверяем входные данные
 	if in == nil || in.Id == 0 || len(in.RoleIds) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "Invalid argument")
 	}
 
-	// Добавляем роли пользователю
-	if err := bh.userRepo.AddUserRoles(ctx, int(in.Id), convertInt32SliceToInt(in.RoleIds)); err != nil {
-		log.Printf("add user roles failed, err:%v\n", err)
-		return nil, status.Error(codes.Internal, "Failed to add user roles")
+	// Удаляем роли из организации
+	if err := bh.orgRepo.DeleteOrganizationRoles(ctx, int(in.Id), convertInt32SliceToInt(in.RoleIds)); err != nil {
+		log.Printf("delete organization roles failed, err:%v\n", err)
+		return nil, status.Error(codes.Internal, "Failed to delete organization roles")
 	}
 
-	// Получаем обновленного пользователя с ролями
-	roles, err := bh.userRepo.GetUserRoles(ctx, int(in.Id))
+	// Получаем обновленную организацию с ролями
+	roles, err := bh.orgRepo.GetOrganizationRoles(ctx, int(in.Id))
 	if err != nil {
-		return nil, status.Error(codes.NotFound, "User not found")
+		return nil, status.Error(codes.NotFound, "Organization not found")
 	}
 
 	// Формируем ответ

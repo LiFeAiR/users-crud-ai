@@ -31,6 +31,12 @@ type OrganizationRepository interface {
 	UpdateOrganization(ctx context.Context, org *models.Organization) error
 	DeleteOrganization(ctx context.Context, id int) error
 	GetOrganizations(ctx context.Context, limit, offset int) ([]*models.Organization, error)
+	GetOrganizationPermissions(ctx context.Context, organizationID int) ([]*models.Permission, error)
+	AddOrganizationPermissions(ctx context.Context, organizationID int, permissionIDs []int) error
+	DeleteOrganizationPermissions(ctx context.Context, organizationID int, permissionIDs []int) error
+	GetOrganizationRoles(ctx context.Context, organizationID int) ([]*models.Role, error)
+	AddOrganizationRoles(ctx context.Context, organizationID int, roleIDs []int) error
+	DeleteOrganizationRoles(ctx context.Context, organizationID int, roleIDs []int) error
 	InitDB() error
 }
 

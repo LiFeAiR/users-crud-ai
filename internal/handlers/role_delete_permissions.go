@@ -15,18 +15,18 @@ func (bh *BaseHandler) DeleteRolePermissions(
 	in *api_pb.RolePermissionsRequest,
 ) (out *api_pb.RolePermissionsResponse, err error) {
 	// Проверяем входные данные
-	if in == nil || in.RoleId == 0 || len(in.PermissionIds) == 0 {
+	if in == nil || in.Id == 0 || len(in.PermissionIds) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "Invalid argument")
 	}
 
 	// Удаляем права из роли
-	if err := bh.roleRepo.DeleteRolePermissions(ctx, int(in.RoleId), convertInt32SliceToInt(in.PermissionIds)); err != nil {
+	if err := bh.roleRepo.DeleteRolePermissions(ctx, int(in.Id), convertInt32SliceToInt(in.PermissionIds)); err != nil {
 		log.Printf("delete role permissions failed, err:%v\n", err)
 		return nil, status.Error(codes.Internal, "Failed to delete role permissions")
 	}
 
 	// Получаем обновленную роль с правами
-	role, err := bh.roleRepo.GetRoleWithPermissions(ctx, int(in.RoleId))
+	role, err := bh.roleRepo.GetRoleWithPermissions(ctx, int(in.Id))
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "Role not found")
 	}

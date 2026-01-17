@@ -12,6 +12,36 @@ type MockOrganizationRepository struct {
 	mock.Mock
 }
 
+func (m *MockOrganizationRepository) GetOrganizationPermissions(ctx context.Context, organizationID int) ([]*models.Permission, error) {
+	args := m.Called(ctx, organizationID)
+	return args.Get(0).([]*models.Permission), args.Error(1)
+}
+
+func (m *MockOrganizationRepository) AddOrganizationPermissions(ctx context.Context, organizationID int, permissionIDs []int) error {
+	args := m.Called(ctx, organizationID, permissionIDs)
+	return args.Error(0)
+}
+
+func (m *MockOrganizationRepository) DeleteOrganizationPermissions(ctx context.Context, organizationID int, permissionIDs []int) error {
+	args := m.Called(ctx, organizationID, permissionIDs)
+	return args.Error(0)
+}
+
+func (m *MockOrganizationRepository) GetOrganizationRoles(ctx context.Context, organizationID int) ([]*models.Role, error) {
+	args := m.Called(ctx, organizationID)
+	return args.Get(0).([]*models.Role), args.Error(1)
+}
+
+func (m *MockOrganizationRepository) AddOrganizationRoles(ctx context.Context, organizationID int, roleIDs []int) error {
+	args := m.Called(ctx, organizationID, roleIDs)
+	return args.Error(0)
+}
+
+func (m *MockOrganizationRepository) DeleteOrganizationRoles(ctx context.Context, organizationID int, roleIDs []int) error {
+	args := m.Called(ctx, organizationID, roleIDs)
+	return args.Error(0)
+}
+
 func (m *MockOrganizationRepository) CreateOrganization(ctx context.Context, org *models.Organization) (*models.Organization, error) {
 	args := m.Called(ctx, org)
 

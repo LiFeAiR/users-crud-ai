@@ -27,6 +27,12 @@ func TestBaseHandler_GetOrganization(t *testing.T) {
 
 		// Определяем ожидаемое поведение мока
 		mockRepo.On("GetOrganizationByID", ctx, 1).Return(testOrg, nil)
+		mockRepo.On("GetOrganizationPermissions", ctx, 1).Return([]*models.Permission{{
+			ID:          0,
+			Name:        "1",
+			Code:        "2",
+			Description: "3",
+		}}, nil)
 
 		// Создаем базовый обработчик с моком
 		baseHandler := &BaseHandler{
@@ -41,6 +47,7 @@ func TestBaseHandler_GetOrganization(t *testing.T) {
 		assert.NotNil(t, org)
 		assert.Equal(t, int32(1), org.Id)
 		assert.Equal(t, "Test Org", org.Name)
+		assert.Len(t, org.Permissions, 1)
 
 		// Проверяем, что мок был вызван правильно
 		mockRepo.AssertExpectations(t)

@@ -135,6 +135,164 @@
         ]
       }
     },
+    "/api/organization/{id}/permissions/add": {
+      "post": {
+        "summary": "Organization permissions operations",
+        "operationId": "CrudService_AddOrganizationPermissions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/grpcRolePermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/grpcOrganizationPermissionsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CrudService"
+        ]
+      }
+    },
+    "/api/organization/{id}/permissions/delete": {
+      "post": {
+        "operationId": "CrudService_DeleteOrganizationPermissions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/grpcRolePermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/grpcOrganizationPermissionsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CrudService"
+        ]
+      }
+    },
+    "/api/organization/{id}/roles/add": {
+      "post": {
+        "summary": "Organization roles operations",
+        "operationId": "CrudService_AddOrganizationRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/grpcRolesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/grpcOrganizationRolesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CrudService"
+        ]
+      }
+    },
+    "/api/organization/{id}/roles/delete": {
+      "post": {
+        "operationId": "CrudService_DeleteOrganizationRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/grpcRolesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/grpcOrganizationRolesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CrudService"
+        ]
+      }
+    },
     "/api/organizations": {
       "get": {
         "summary": "Organization CRUD operations",
@@ -457,7 +615,7 @@
         ]
       }
     },
-    "/api/role/{role_id}/permissions/add": {
+    "/api/role/{id}/permissions/add": {
       "post": {
         "summary": "Role permissions operations",
         "operationId": "CrudService_AddRolePermissions",
@@ -477,7 +635,7 @@
         },
         "parameters": [
           {
-            "name": "role_id",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -497,7 +655,7 @@
         ]
       }
     },
-    "/api/role/{role_id}/permissions/delete": {
+    "/api/role/{id}/permissions/delete": {
       "post": {
         "operationId": "CrudService_DeleteRolePermissions",
         "responses": {
@@ -516,7 +674,7 @@
         },
         "parameters": [
           {
-            "name": "role_id",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -697,7 +855,7 @@
         ]
       }
     },
-    "/api/user/{user_id}/permissions/add": {
+    "/api/user/{id}/permissions/add": {
       "post": {
         "summary": "User permissions operations",
         "operationId": "CrudService_AddUserPermissions",
@@ -717,7 +875,7 @@
         },
         "parameters": [
           {
-            "name": "user_id",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -737,7 +895,7 @@
         ]
       }
     },
-    "/api/user/{user_id}/permissions/delete": {
+    "/api/user/{id}/permissions/delete": {
       "post": {
         "operationId": "CrudService_DeleteUserPermissions",
         "responses": {
@@ -756,7 +914,7 @@
         },
         "parameters": [
           {
-            "name": "user_id",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -776,7 +934,7 @@
         ]
       }
     },
-    "/api/user/{user_id}/roles/add": {
+    "/api/user/{id}/roles/add": {
       "post": {
         "summary": "User roles operations",
         "operationId": "CrudService_AddUserRoles",
@@ -796,7 +954,7 @@
         },
         "parameters": [
           {
-            "name": "user_id",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -816,7 +974,7 @@
         ]
       }
     },
-    "/api/user/{user_id}/roles/delete": {
+    "/api/user/{id}/roles/delete": {
       "post": {
         "operationId": "CrudService_DeleteUserRoles",
         "responses": {
@@ -835,7 +993,7 @@
         },
         "parameters": [
           {
-            "name": "user_id",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -960,6 +1118,12 @@
         },
         "name": {
           "type": "string"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/grpcPermission"
+          }
         }
       }
     },
@@ -968,6 +1132,38 @@
       "properties": {
         "name": {
           "type": "string"
+        }
+      }
+    },
+    "grpcOrganizationPermissionsRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "permission_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "grpcOrganizationRolesRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "role_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
         }
       }
     },
@@ -1096,7 +1292,7 @@
     "grpcRolePermissionsRequest": {
       "type": "object",
       "properties": {
-        "role_id": {
+        "id": {
           "type": "integer",
           "format": "int32"
         },
@@ -1194,7 +1390,7 @@
     "grpcUserPermissionsRequest": {
       "type": "object",
       "properties": {
-        "user_id": {
+        "id": {
           "type": "integer",
           "format": "int32"
         },
@@ -1210,7 +1406,7 @@
     "grpcUserRolesRequest": {
       "type": "object",
       "properties": {
-        "user_id": {
+        "id": {
           "type": "integer",
           "format": "int32"
         },

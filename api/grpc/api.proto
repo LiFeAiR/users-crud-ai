@@ -63,17 +63,27 @@ message RolesResponse {
 }
 
 message UserPermissionsRequest {
-  int32 user_id = 1;
+  int32 id = 1;
   repeated int32 permission_ids = 2;
 }
 
 message UserRolesRequest {
-  int32 user_id = 1;
+  int32 id = 1;
   repeated int32 role_ids = 2;
 }
 
+message OrganizationRolesRequest {
+  int32 id = 1;
+  repeated int32 role_ids = 2;
+}
+
+message OrganizationPermissionsRequest {
+  int32 id = 1;
+  repeated int32 permission_ids = 2;
+}
+
 message RolePermissionsRequest {
-  int32 role_id = 1;
+  int32 id = 1;
   repeated int32 permission_ids = 2;
 }
 
@@ -129,6 +139,7 @@ message UsersResponse {
 message Organization {
   int32 id = 1;
   string name = 2;
+  repeated Permission permissions = 5;
 }
 
 message OrganizationCreateRequest {
@@ -184,13 +195,13 @@ service CrudService {
   // User permissions operations
   rpc AddUserPermissions (UserPermissionsRequest) returns (RolePermissionsResponse) {
     option (google.api.http) = {
-      post: "/api/user/{user_id}/permissions/add"
+      post: "/api/user/{id}/permissions/add"
       body: "*"
     };
   }
   rpc DeleteUserPermissions (UserPermissionsRequest) returns (RolePermissionsResponse) {
     option (google.api.http) = {
-      post: "/api/user/{user_id}/permissions/delete"
+      post: "/api/user/{id}/permissions/delete"
       body: "*"
     };
   }
@@ -198,13 +209,13 @@ service CrudService {
   // User roles operations
   rpc AddUserRoles (UserRolesRequest) returns (RolesResponse) {
     option (google.api.http) = {
-      post: "/api/user/{user_id}/roles/add"
+      post: "/api/user/{id}/roles/add"
       body: "*"
     };
   }
   rpc DeleteUserRoles (UserRolesRequest) returns (RolesResponse) {
     option (google.api.http) = {
-      post: "/api/user/{user_id}/roles/delete"
+      post: "/api/user/{id}/roles/delete"
       body: "*"
     };
   }
@@ -235,6 +246,34 @@ service CrudService {
   rpc DeleteOrganization (Id) returns (Empty) {
     option (google.api.http) = {
       delete: "/api/organization/{id}"
+    };
+  }
+
+  // Organization permissions operations
+  rpc AddOrganizationPermissions (OrganizationPermissionsRequest) returns (RolePermissionsResponse) {
+    option (google.api.http) = {
+      post: "/api/organization/{id}/permissions/add"
+      body: "*"
+    };
+  }
+  rpc DeleteOrganizationPermissions (OrganizationPermissionsRequest) returns (RolePermissionsResponse) {
+    option (google.api.http) = {
+      post: "/api/organization/{id}/permissions/delete"
+      body: "*"
+    };
+  }
+
+  // Organization roles operations
+  rpc AddOrganizationRoles (OrganizationRolesRequest) returns (RolesResponse) {
+    option (google.api.http) = {
+      post: "/api/organization/{id}/roles/add"
+      body: "*"
+    };
+  }
+  rpc DeleteOrganizationRoles (OrganizationRolesRequest) returns (RolesResponse) {
+    option (google.api.http) = {
+      post: "/api/organization/{id}/roles/delete"
+      body: "*"
     };
   }
 
@@ -299,14 +338,14 @@ service CrudService {
   // Role permissions operations
   rpc AddRolePermissions (RolePermissionsRequest) returns (RolePermissionsResponse) {
     option (google.api.http) = {
-      post: "/api/role/{role_id}/permissions/add"
+      post: "/api/role/{id}/permissions/add"
       body: "*"
     };
   }
 
   rpc DeleteRolePermissions (RolePermissionsRequest) returns (RolePermissionsResponse) {
     option (google.api.http) = {
-      post: "/api/role/{role_id}/permissions/delete"
+      post: "/api/role/{id}/permissions/delete"
       body: "*"
     };
   }
