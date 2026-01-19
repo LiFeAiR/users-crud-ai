@@ -12,6 +12,16 @@ type MockOrganizationRepository struct {
 	mock.Mock
 }
 
+func (m *MockOrganizationRepository) SetOrganizationTariff(ctx context.Context, orgID int, tariffID *int32) error {
+	args := m.Called(ctx, orgID, tariffID)
+	return args.Error(0)
+}
+
+func (m *MockOrganizationRepository) GetOrganizationTariff(ctx context.Context, orgID int) (*models.Tariff, error) {
+	args := m.Called(ctx, orgID)
+	return args.Get(0).(*models.Tariff), args.Error(1)
+}
+
 func (m *MockOrganizationRepository) GetOrganizationPermissions(ctx context.Context, organizationID int) ([]*models.Permission, error) {
 	args := m.Called(ctx, organizationID)
 	return args.Get(0).([]*models.Permission), args.Error(1)

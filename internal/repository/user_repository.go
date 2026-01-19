@@ -78,12 +78,15 @@ func (r *userRepository) CreateUser(ctx context.Context, user *models.User) (*mo
 
 // GetUserByID получает пользователя по ID
 func (r *userRepository) GetUserByID(ctx context.Context, id int) (*models.User, error) {
-	query := `SELECT id, name, email, organization_id FROM users WHERE id = $1`
+	query := `SELECT id, name, email, organization_id, tariff_id FROM users WHERE id = $1`
 	row := r.db.GetConnection().QueryRow(ctx, query, id)
 
 	user := &models.User{}
-	var org sql.NullInt32
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &org)
+	var (
+		org    sql.NullInt32
+		tariff sql.NullInt32
+	)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &org, &tariff)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, fmt.Errorf("user not found")
@@ -96,6 +99,11 @@ func (r *userRepository) GetUserByID(ctx context.Context, id int) (*models.User,
 		user.Organization = &models.Organization{ID: int(org.Int32)}
 	} else {
 		user.Organization = nil
+	}
+
+	// Проверяем, было ли значение NULL
+	if tariff.Valid {
+		user.TariffID = utils.Ptr(int(tariff.Int32))
 	}
 
 	return user, nil
@@ -325,6 +333,45 @@ func (r *userRepository) DeleteUserRoles(ctx context.Context, userID int, roleID
 	return nil
 }
 
+// SetUserTariff устанавливает тариф пользователю
+func (r *userRepository) SetUserTariff(ctx context.Context, userID int, tariffID *int32) error {
+	var tariffIDVal interface{}
+	if tariffID != nil {
+		tariffIDVal = *tariffID
+	} else {
+		tariffIDVal = nil
+	}
+
+	query := `UPDATE users SET tariff_id = $1 WHERE id = $2`
+	_, err := r.db.GetConnection().Exec(ctx, query, tariffIDVal, userID)
+	if err != nil {
+		return fmt.Errorf("failed to set user tariff: %w", err)
+	}
+
+	return nil
+}
+
+// GetUserTariff получает тариф пользователя
+func (r *userRepository) GetUserTariff(ctx context.Context, userID int) (*models.Tariff, error) {
+	query := `SELECT t.id, t.name, t.description, t.price
+	          FROM users u
+	          LEFT JOIN tariffs t ON u.tariff_id = t.id
+	          WHERE u.id = $1`
+
+	row := r.db.GetConnection().QueryRow(ctx, query, userID)
+
+	tariff := &models.Tariff{}
+	err := row.Scan(&tariff.ID, &tariff.Name, &tariff.Description, &tariff.Price)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get user tariff: %w", err)
+	}
+
+	return tariff, nil
+}
+
 // InitDB инициализирует таблицы в БД
 func (r *userRepository) InitDB() error {
 	query := `
@@ -333,7 +380,8 @@ CREATE TABLE IF NOT EXISTS users (
 	name VARCHAR(255) NOT NULL,
 	email VARCHAR(255) UNIQUE NOT NULL,
 	password_hash TEXT,
-    organization_id integer
+    organization_id integer,
+    tariff_id integer
 );
 alter table users
     drop IF EXISTS organization;
@@ -341,6 +389,8 @@ alter table users
     add IF NOT EXISTS organization_id integer;
 alter table users
     add IF NOT EXISTS password_hash TEXT;
+alter table users
+    add IF NOT EXISTS tariff_id integer;
 
 -- Таблица для связи пользователей и прав
 CREATE TABLE IF NOT EXISTS user_permissions (

@@ -21,6 +21,8 @@ type UserRepository interface {
 	GetUserRoles(ctx context.Context, userID int) ([]*models.Role, error)
 	AddUserRoles(ctx context.Context, userID int, roleIDs []int) error
 	DeleteUserRoles(ctx context.Context, userID int, roleIDs []int) error
+	SetUserTariff(ctx context.Context, userID int, tariffID *int32) error
+	GetUserTariff(ctx context.Context, userID int) (*models.Tariff, error)
 	InitDB() error
 }
 
@@ -37,6 +39,8 @@ type OrganizationRepository interface {
 	GetOrganizationRoles(ctx context.Context, organizationID int) ([]*models.Role, error)
 	AddOrganizationRoles(ctx context.Context, organizationID int, roleIDs []int) error
 	DeleteOrganizationRoles(ctx context.Context, organizationID int, roleIDs []int) error
+	SetOrganizationTariff(ctx context.Context, orgID int, tariffID *int32) error
+	GetOrganizationTariff(ctx context.Context, orgID int) (*models.Tariff, error)
 	InitDB() error
 }
 

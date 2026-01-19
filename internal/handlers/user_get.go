@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 
+	"github.com/LiFeAiR/crud-ai/internal/utils"
 	api_pb "github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -29,8 +30,9 @@ func (bh *BaseHandler) GetUser(ctx context.Context, in *api_pb.Id) (out *api_pb.
 		}
 
 		orgOut = &api_pb.Organization{
-			Id:   int32(user.Organization.ID),
-			Name: user.Organization.Name,
+			Id:       int32(user.Organization.ID),
+			Name:     user.Organization.Name,
+			TariffId: int32(utils.FromPtr(org.TariffID)),
 		}
 	}
 
@@ -54,6 +56,7 @@ func (bh *BaseHandler) GetUser(ctx context.Context, in *api_pb.Id) (out *api_pb.
 		Name:         user.Name,
 		Email:        user.Email,
 		Organization: orgOut,
+		TariffId:     int32(utils.FromPtr(user.TariffID)),
 		Permissions:  permissionsOut,
 	}, nil
 }

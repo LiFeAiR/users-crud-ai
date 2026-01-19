@@ -12,6 +12,16 @@ type MockUserRepository struct {
 	mock.Mock
 }
 
+func (m *MockUserRepository) SetUserTariff(ctx context.Context, userID int, tariffID *int32) error {
+	args := m.Called(ctx, userID, tariffID)
+	return args.Error(0)
+}
+
+func (m *MockUserRepository) GetUserTariff(ctx context.Context, userID int) (*models.Tariff, error) {
+	args := m.Called(ctx, userID)
+	return args.Get(0).(*models.Tariff), args.Error(1)
+}
+
 func (m *MockUserRepository) GetUserPermissions(ctx context.Context, userID int) ([]*models.Permission, error) {
 	args := m.Called(ctx, userID)
 	return args.Get(0).([]*models.Permission), args.Error(1)

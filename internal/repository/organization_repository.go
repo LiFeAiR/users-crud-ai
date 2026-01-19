@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 
 	"github.com/LiFeAiR/crud-ai/internal/models"
+	"github.com/LiFeAiR/crud-ai/internal/utils"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -31,16 +33,22 @@ func (r *organizationRepository) CreateOrganization(ctx context.Context, org *mo
 
 // GetOrganizationByID получает организацию по ID
 func (r *organizationRepository) GetOrganizationByID(ctx context.Context, id int) (*models.Organization, error) {
-	query := `SELECT id, name FROM organizations WHERE id = $1`
+	query := `SELECT id, name, tariff_id FROM organizations WHERE id = $1`
 	row := r.db.GetConnection().QueryRow(ctx, query, id)
 
 	org := &models.Organization{}
-	err := row.Scan(&org.ID, &org.Name)
+	var tariff sql.NullInt32
+	err := row.Scan(&org.ID, &org.Name, &tariff)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, fmt.Errorf("organization not found")
 		}
 		return nil, fmt.Errorf("failed to get organization: %w", err)
+	}
+
+	// Проверяем, было ли значение NULL
+	if tariff.Valid {
+		org.TariffID = utils.Ptr(int(tariff.Int32))
 	}
 
 	return org, nil
@@ -253,38 +261,69 @@ func (r *organizationRepository) DeleteOrganizationRoles(ctx context.Context, or
 	return nil
 }
 
+// SetOrganizationTariff устанавливает тариф организации
+func (r *organizationRepository) SetOrganizationTariff(ctx context.Context, orgID int, tariffID *int32) error {
+	var tariffIDVal interface{}
+	if tariffID != nil {
+		tariffIDVal = *tariffID
+	} else {
+		tariffIDVal = nil
+	}
+
+	query := `UPDATE organizations SET tariff_id = $1 WHERE id = $2`
+	_, err := r.db.GetConnection().Exec(ctx, query, tariffIDVal, orgID)
+	if err != nil {
+		return fmt.Errorf("failed to set organization tariff: %w", err)
+	}
+
+	return nil
+}
+
+// GetOrganizationTariff получает тариф организации
+func (r *organizationRepository) GetOrganizationTariff(ctx context.Context, orgID int) (*models.Tariff, error) {
+	query := `SELECT t.id, t.name, t.description, t.price
+	          FROM organizations o
+	          LEFT JOIN tariffs t ON o.tariff_id = t.id
+	          WHERE o.id = $1`
+
+	row := r.db.GetConnection().QueryRow(ctx, query, orgID)
+
+	tariff := &models.Tariff{}
+	err := row.Scan(&tariff.ID, &tariff.Name, &tariff.Description, &tariff.Price)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get organization tariff: %w", err)
+	}
+
+	return tariff, nil
+}
+
 // InitDB инициализирует таблицы в БД для организаций
 func (r *organizationRepository) InitDB() error {
 	query := `
 CREATE TABLE IF NOT EXISTS organizations (
-id SERIAL PRIMARY KEY,
-name VARCHAR(255) NOT NULL
-)`
-	_, err := r.db.GetConnection().Exec(context.Background(), query)
-	if err != nil {
-		return fmt.Errorf("failed to initialize database: %w", err)
-	}
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(255) NOT NULL,
+	tariff_id integer
+);
 
-	// Создание таблицы связи организаций и прав (many-to-many)
-	query = `
+alter table organizations
+    add IF NOT EXISTS tariff_id integer;
+
 CREATE TABLE IF NOT EXISTS organization_permissions (
-organization_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE,
-permission_id INTEGER REFERENCES permissions(id) ON DELETE CASCADE,
-PRIMARY KEY (organization_id, permission_id)
-)`
-	_, err = r.db.GetConnection().Exec(context.Background(), query)
-	if err != nil {
-		return fmt.Errorf("failed to initialize organization_permissions table: %w", err)
-	}
+	organization_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE,
+	permission_id INTEGER REFERENCES permissions(id) ON DELETE CASCADE,
+	PRIMARY KEY (organization_id, permission_id)
+);
 
-	// Создание таблицы связи организаций и ролей (many-to-many)
-	query = `
 CREATE TABLE IF NOT EXISTS organization_roles (
-organization_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE,
-role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
-PRIMARY KEY (organization_id, role_id)
-)`
-	_, err = r.db.GetConnection().Exec(context.Background(), query)
+	organization_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE,
+	role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
+	PRIMARY KEY (organization_id, role_id)
+);`
+	_, err := r.db.GetConnection().Exec(context.Background(), query)
 	if err != nil {
 		return fmt.Errorf("failed to initialize organization_roles table: %w", err)
 	}

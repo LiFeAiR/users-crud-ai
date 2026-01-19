@@ -20,8 +20,10 @@ message User {
   int32 id = 1;
   string name = 2;
   string email = 3;
-  Organization organization = 4;
-  repeated Permission permissions = 5;
+  int32 organization_id = 4;
+  int32 tariff_id = 5;
+  Organization organization = 6;
+  repeated Permission permissions = 7;
 }
 
 message Permission {
@@ -104,6 +106,24 @@ message Tariff {
   repeated Role roles = 5;
 }
 
+message UserTariffRequest {
+  int32 id = 1;
+  int32 tariff_id = 2;
+}
+
+message UserTariffResponse {
+  Tariff tariff = 1;
+}
+
+message OrganizationTariffRequest {
+  int32 id = 1;
+  int32 tariff_id = 2;
+}
+
+message OrganizationTariffResponse {
+  Tariff tariff = 1;
+}
+
 message TariffCreateRequest {
   string name = 1;
   string description = 2;
@@ -169,7 +189,8 @@ message UsersResponse {
 message Organization {
   int32 id = 1;
   string name = 2;
-  repeated Permission permissions = 5;
+  int32 tariff_id = 3;
+  repeated Permission permissions = 4;
 }
 
 message OrganizationCreateRequest {
@@ -250,6 +271,25 @@ service CrudService {
     };
   }
 
+  // User tariff operations
+  rpc AddUserTariff (UserTariffRequest) returns (UserTariffResponse) {
+    option (google.api.http) = {
+      post: "/api/user/{id}/tariff"
+      body: "*"
+    };
+  }
+  rpc UpdateUserTariff (UserTariffRequest) returns (UserTariffResponse) {
+    option (google.api.http) = {
+      put: "/api/user/{id}/tariff"
+      body: "*"
+    };
+  }
+  rpc DeleteUserTariff (UserTariffRequest) returns (Empty) {
+    option (google.api.http) = {
+      delete: "/api/user/{id}/tariff"
+    };
+  }
+
   // Organization CRUD operations
   rpc GetOrganizations (ListRequest) returns (OrganizationsResponse) {
     option (google.api.http) = {
@@ -304,6 +344,25 @@ service CrudService {
     option (google.api.http) = {
       post: "/api/organization/{id}/roles/delete"
       body: "*"
+    };
+  }
+
+  // Organization tariff operations
+  rpc AddOrganizationTariff (OrganizationTariffRequest) returns (OrganizationTariffResponse) {
+    option (google.api.http) = {
+      post: "/api/organization/{id}/tariff"
+      body: "*"
+    };
+  }
+  rpc UpdateOrganizationTariff (OrganizationTariffRequest) returns (OrganizationTariffResponse) {
+    option (google.api.http) = {
+      put: "/api/organization/{id}/tariff"
+      body: "*"
+    };
+  }
+  rpc DeleteOrganizationTariff (OrganizationTariffRequest) returns (Empty) {
+    option (google.api.http) = {
+      delete: "/api/organization/{id}/tariff"
     };
   }
 

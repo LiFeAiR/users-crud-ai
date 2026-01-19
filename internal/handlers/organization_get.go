@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 
+	"github.com/LiFeAiR/crud-ai/internal/utils"
 	api_pb "github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -39,6 +40,7 @@ func (bh *BaseHandler) GetOrganization(ctx context.Context, in *api_pb.Id) (out 
 	return &api_pb.Organization{
 		Id:          int32(org.ID),
 		Name:        org.Name,
+		TariffId:    int32(utils.FromPtr(org.TariffID)),
 		Permissions: permissionsOut,
 	}, nil
 }
