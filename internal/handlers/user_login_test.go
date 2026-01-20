@@ -30,6 +30,7 @@ func TestBaseHandler_Login(t *testing.T) {
 		// Определяем ожидаемое поведение мока
 		mockRepo.On("GetUserByEmail", ctx, "test@example.com").Return(expectedUser, nil)
 		mockRepo.On("CheckPassword", ctx, 1, "password123").Return(true, nil)
+		mockRepo.On("GetUserPermissions", ctx, 1).Return([]*models.Permission(nil), nil)
 
 		// Создаем базовый обработчик с моком
 		baseHandler := &BaseHandler{

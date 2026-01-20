@@ -40,8 +40,24 @@ func (bh *BaseHandler) Login(ctx context.Context, in *api_pb.LoginRequest) (out 
 		return nil, status.Error(codes.Unauthenticated, "Invalid credentials")
 	}
 
+	// Получаем права пользователя
+	permissions, err := bh.userRepo.GetUserPermissions(ctx, user.ID)
+
+	// Формируем ответ
+	jwtPermissions := make([]string, 0, len(permissions))
+	permissionsOut := make([]*api_pb.Permission, 0, len(permissions))
+	for _, permission := range permissions {
+		jwtPermissions = append(jwtPermissions, permission.Code)
+		permissionsOut = append(permissionsOut, &api_pb.Permission{
+			Id:          int32(permission.ID),
+			Name:        permission.Name,
+			Code:        permission.Code,
+			Description: permission.Description,
+		})
+	}
+
 	// Генерируем JWT токен
-	token, err := utils.GenerateJWT(user.ID, user.Email, user.Name, bh.secretKey)
+	token, err := utils.GenerateJWT(bh.secretKey, user.ID, user.Email, user.Name, jwtPermissions)
 	if err != nil {
 		log.Printf("Failed to generate JWT token, err:%v\n", err)
 		return nil, status.Error(codes.Internal, "Authentication failed")
@@ -68,6 +84,7 @@ func (bh *BaseHandler) Login(ctx context.Context, in *api_pb.LoginRequest) (out 
 			Name:         user.Name,
 			Email:        user.Email,
 			Organization: orgOut,
+			Permissions:  permissionsOut,
 		},
 	}, nil
 }
