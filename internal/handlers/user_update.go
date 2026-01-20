@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/LiFeAiR/crud-ai/internal/models"
+	"github.com/LiFeAiR/crud-ai/internal/server/middleware/auth"
 	"github.com/LiFeAiR/crud-ai/internal/utils"
 	api_pb "github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"google.golang.org/grpc/codes"
@@ -16,6 +18,11 @@ func (bh *BaseHandler) UpdateUser(ctx context.Context, in *api_pb.UserUpdateRequ
 	// Проверяем входные данные
 	if in == nil || in.Id == 0 {
 		return nil, status.Error(codes.InvalidArgument, "Invalid argument")
+	}
+
+	err = checkPermissions(ctx, in.Id)
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "Invalid credentials")
 	}
 
 	var org *models.Organization
@@ -73,4 +80,22 @@ func (bh *BaseHandler) UpdateUser(ctx context.Context, in *api_pb.UserUpdateRequ
 		Email:        user.Email,
 		Organization: orgOut,
 	}, nil
+}
+
+func checkPermissions(ctx context.Context, id int32) error {
+	userID, ok := ctx.Value(auth.UserIDKey).(int)
+	if !ok {
+		return errors.New("auth.UserIDKey")
+	}
+
+	isAdmin, ok := ctx.Value(auth.IsAdminKey).(bool)
+	if !ok {
+		return errors.New("auth.IsAdminKey")
+	}
+
+	if userID == int(id) || isAdmin {
+		return nil
+	}
+
+	return errors.New("checkPermissions.Unauthenticated")
 }

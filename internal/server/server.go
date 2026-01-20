@@ -7,6 +7,7 @@ import (
 
 	"github.com/LiFeAiR/crud-ai/internal/handlers"
 	"github.com/LiFeAiR/crud-ai/internal/repository"
+	"github.com/LiFeAiR/crud-ai/internal/server/middleware/auth"
 	gw "github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -94,7 +95,12 @@ func (s *Server) Start(ctx context.Context) error {
 		}
 
 		log.Printf("CrudService Listening on :%s...", s.portHTTP)
-		return http.ListenAndServe(":"+s.portHTTP, mux)
+
+		// apply middlewares
+		var mw http.Handler
+		mw = auth.New(s.secretKey)(mux)
+
+		return http.ListenAndServe(":"+s.portHTTP, mw)
 	})
 
 	group.Go(func() error {

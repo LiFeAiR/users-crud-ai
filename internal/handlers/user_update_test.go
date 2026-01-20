@@ -7,6 +7,7 @@ import (
 
 	"github.com/LiFeAiR/crud-ai/internal/handlers/mocks"
 	"github.com/LiFeAiR/crud-ai/internal/models"
+	"github.com/LiFeAiR/crud-ai/internal/server/middleware/auth"
 	"github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -14,10 +15,12 @@ import (
 
 // TestBaseHandler_UpdateUser тестирует метод UpdateUser базового обработчика
 func TestBaseHandler_UpdateUser(t *testing.T) {
-	ctx := context.Background()
-
 	// Test 1: Успешное обновление пользователя
 	t.Run("UpdateUserSuccess", func(t *testing.T) {
+		ctx := context.Background()
+		ctx = context.WithValue(ctx, auth.UserIDKey, 1)
+		ctx = context.WithValue(ctx, auth.IsAdminKey, false)
+
 		// Создаем мок репозиторий
 		userRepo := new(mocks.MockUserRepository)
 		orgRepo := new(mocks.MockOrganizationRepository)
@@ -56,6 +59,10 @@ func TestBaseHandler_UpdateUser(t *testing.T) {
 
 	// Test 2: Ошибка при отсутствии ID в запросе
 	t.Run("UpdateUserMissingID", func(t *testing.T) {
+		ctx := context.Background()
+		ctx = context.WithValue(ctx, auth.UserIDKey, 0)
+		ctx = context.WithValue(ctx, auth.IsAdminKey, false)
+
 		// Создаем базовый обработчик без мока (не нужен для этого теста)
 		baseHandler := &BaseHandler{}
 
@@ -75,6 +82,10 @@ func TestBaseHandler_UpdateUser(t *testing.T) {
 
 	// Test 3: Ошибка при отсутствии самого запроса
 	t.Run("UpdateUserNilRequest", func(t *testing.T) {
+		ctx := context.Background()
+		ctx = context.WithValue(ctx, auth.UserIDKey, 1)
+		ctx = context.WithValue(ctx, auth.IsAdminKey, false)
+
 		// Создаем базовый обработчик без мока (не нужен для этого теста)
 		baseHandler := &BaseHandler{}
 
@@ -88,6 +99,10 @@ func TestBaseHandler_UpdateUser(t *testing.T) {
 
 	// Test 4: Ошибка при неудачном обновлении в репозитории
 	t.Run("UpdateUserRepositoryError", func(t *testing.T) {
+		ctx := context.Background()
+		ctx = context.WithValue(ctx, auth.UserIDKey, 1)
+		ctx = context.WithValue(ctx, auth.IsAdminKey, false)
+
 		// Создаем мок репозиторий
 		mockRepo := new(mocks.MockUserRepository)
 
@@ -116,9 +131,4 @@ func TestBaseHandler_UpdateUser(t *testing.T) {
 		// Проверяем, что мок был вызван правильно
 		mockRepo.AssertExpectations(t)
 	})
-}
-
-// Вспомогательная функция для создания указателя на строку
-func stringPtr(s string) *string {
-	return &s
 }
