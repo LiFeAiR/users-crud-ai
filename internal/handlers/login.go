@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 
-	"github.com/LiFeAiR/crud-ai/internal/utils"
 	api_pb "github.com/LiFeAiR/crud-ai/pkg/server/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -57,7 +56,7 @@ func (bh *BaseHandler) Login(ctx context.Context, in *api_pb.LoginRequest) (out 
 	}
 
 	// Генерируем JWT токен
-	token, err := utils.GenerateJWT(bh.secretKey, user.ID, user.Email, user.Name, jwtPermissions)
+	token, err := bh.jwtFunc(bh.secretKey, user.ID, user.Email, user.Name, jwtPermissions)
 	if err != nil {
 		log.Printf("Failed to generate JWT token, err:%v\n", err)
 		return nil, status.Error(codes.Internal, "Authentication failed")

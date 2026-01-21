@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/LiFeAiR/crud-ai/internal/repository"
+	"github.com/LiFeAiR/crud-ai/internal/utils"
 )
 
 // BaseHandler базовый обработчик, который принимает репозитории
@@ -12,6 +13,8 @@ type BaseHandler struct {
 	roleRepo   repository.RoleRepository
 	tariffRepo repository.TariffRepository
 	secretKey  string
+
+	jwtFunc func(string, int, string, string, []string) (string, error)
 }
 
 // NewBaseHandler создает новый базовый обработчик
@@ -30,6 +33,7 @@ func NewBaseHandler(
 		roleRepo:   roleRepo,
 		tariffRepo: tariffRepo,
 		secretKey:  secretKey,
+		jwtFunc:    utils.GenerateJWT,
 	}
 }
 

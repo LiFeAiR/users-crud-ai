@@ -14,6 +14,9 @@ import (
 // TestBaseHandler_Login тестирует метод Login базового обработчика
 func TestBaseHandler_Login(t *testing.T) {
 	ctx := context.Background()
+	f := func(s string, i int, s2 string, s3 string, strings []string) (string, error) {
+		return "test-test-test", nil
+	}
 
 	// Test 1: Успешная авторизация
 	t.Run("LoginSuccess", func(t *testing.T) {
@@ -35,6 +38,7 @@ func TestBaseHandler_Login(t *testing.T) {
 		// Создаем базовый обработчик с моком
 		baseHandler := &BaseHandler{
 			userRepo: mockRepo,
+			jwtFunc:  f,
 		}
 
 		// Вызываем метод Login
@@ -67,6 +71,7 @@ func TestBaseHandler_Login(t *testing.T) {
 		// Создаем базовый обработчик с моком
 		baseHandler := &BaseHandler{
 			userRepo: mockRepo,
+			jwtFunc:  f,
 		}
 
 		// Вызываем метод Login
